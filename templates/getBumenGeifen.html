@@ -1,0 +1,59 @@
+{% extends "addTeacher.html" %}
+
+{% block  body_block %}
+<div class="Hui-article">
+	<article class="cl pd-20">
+
+		<div class="mt-20">
+			<table class="table table-border table-bordered table-hover table-bg table-sort">
+				<thead>
+					<tr class="text-c">
+
+						<th width="80">bumen_id</th>
+						<th width="80">t_id</th>
+						<th width="100">num1</th>
+						<th width="100">num2</th>
+						<th width="100">num3</th>
+						<th width="100">num4</th>
+					</tr>
+				</thead>
+				<tbody id="tab">
+
+				</tbody>
+			</table>
+		</div>
+	</article>
+	<a href="/outputBumenGeifen" ><input class="btn btn-primary radius"  type="submit" value="导出表"></a>
+</div>
+
+
+<script>
+	$.ajax({
+		async: false,
+		type: 'POST',
+		url: '/getBumenGeifen',
+		data: {
+		},
+		dataType: 'json',
+		success: function (data, stats) {
+			for (var i = 0, len = data.length; i < len; i++) {
+				$("#tab").append("\
+				<tr class='text-c'>\
+								<td>"+data[i]['bumen_id']+"</td >\
+								<td>"+data[i]['t_id']+"</td >\
+								<td>"+data[i]['num1']+"</td >\
+								<td>"+data[i]['num2']+"</td >\
+								<td>"+data[i]['num3']+"</td >\
+								<td>"+data[i]['num4']+"</td >\
+							</tr >\
+					");
+			}
+
+		},
+		error: function (XMLHttpRequest, textStatus, errorThrown) {
+			console.log('Wrong~');
+		}
+	}
+	);
+</script>
+{% endblock %}

@@ -1,0 +1,128 @@
+{% extends "index.html" %}
+
+{% block  body_block %}
+<section class="Hui-article-box">
+
+	<div class="Hui-article">
+
+		<table id="tab">
+			<tr>
+				<th>部门名称</th>
+				<th>1</th>
+				<th>2</th>
+				<th>3</th>
+				<th>4</th>
+				<th>求和</th>
+			</tr>
+
+		</table>
+
+		<script type="text/javascript">
+			$.ajax({
+				async: false,
+				type: 'POST',
+				url: '/getBumeninfo',
+				data: {
+				},
+				dataType: 'json',
+				success: function (data, stats) {
+					if (data[0]['bumen_name'] == '已评分') {
+						alert("已评分");
+						$("#main_box").append('<input id="btn_chongxuan" class="btn btn-primary radius" type="submit" value="重选">')
+						return;
+					}
+					var names = new Array();
+					for (var i = 0, len = data.length; i < len; i++) {
+						// names[i] = data[i]['t_name'];
+						$("#tab").append("\
+							<tr><td>" + data[i]['bumen_name'] + "</td>\
+							<td>\
+								<input class='input_f' type='text' name=1"+ data[i]['bumen_id'] + "></input>\
+							</td>\
+							<td>\
+								<input class='input_f' type='text' name=2"+ data[i]['bumen_id'] + " ></input>\
+							</td>\
+							<td>\
+								<input class='input_f' type='text' name=3"+ data[i]['bumen_id'] + " ></input>\
+							</td>\
+							<td>\
+								<input class='input_f' type='text' name=4"+ data[i]['bumen_id'] + " ></input>\
+							</td>\
+							<td>\
+								<input class='input_sum' type='submit' name='5"+ data[i]['bumen_id'] + "' value='' disabled='false'/>\
+							</td>\
+							</tr>\
+							");
+					}
+					$("#tab").append("<input type='submit' id='submit'></input>");
+					$("#tab").append("<input type='submit' id='sum' value='求和'></input>");
+					$("#sum").click(function () {
+
+						var inputs = $("#tab>tr");
+						inputs.each(function () {
+							var input_fs;
+							var sum=0;
+							input_fs=$(this).find(".input_f");
+							for(var i=0;i<4;i++){
+								sum+=parseFloat(input_fs[i].value);
+							}
+							$(this).find(".input_sum").val(sum);
+						});
+
+					});
+					$("#submit").click(function () {
+						var o = new Object;
+						var inputs = $("input[type='text']");
+						inputs.each(function () {
+
+							o[this.name] = this.value
+
+						});
+
+						var json = JSON.stringify(o);
+						$.ajax({
+							async: true,
+							type: 'POST',
+							url: '/postBumenScore',
+							data: {
+								json
+							},
+
+							success: function (data) {
+								alert(data);
+								if (data == 'success') { window.location.reload(); }
+							},
+							error: function () {
+								console.log('Wrong~');
+							}
+						});
+					});
+
+				},
+				error: function (XMLHttpRequest, textStatus, errorThrown) {
+					console.log('Wrong~');
+				}
+			}
+			);
+			$("#btn_chongxuan").click(function () {
+				$.ajax({
+					async: true,
+					type: 'POST',
+					url: '/clearBumenGeifen',
+					data: {
+					},
+
+					success: function (data) {
+						alert(data);
+						if (data == 'success') { window.location.reload(); }
+					},
+					error: function () {
+						console.log('Wrong~');
+					}
+				});
+			});
+		</script>
+
+	</div>
+</section>
+{% endblock %}

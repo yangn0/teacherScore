@@ -1,0 +1,104 @@
+{% extends "index.html" %}
+
+{% block  _menu %}
+<aside class="Hui-aside">
+
+	<div class="menu_dropdown bk_2">
+		<dl id="menu-article">
+			<dt><i class="Hui-iconfont">&#xe616;</i> 教师<i class="Hui-iconfont menu_dropdown-arrow">&#xe6d5;</i>
+			</dt>
+			<dd>
+				<ul>
+					<li><a href="/addTeacher" title="导入教师">导入教师</a></li>
+					<li><a href="/getTeacherAllinfo" title="查看教师表">查看教师表</a></li>
+					<li><a href="/getTeacherGeifen" title="查看给分表">查看给分表</a></li>
+					<li><a href="/getTeacherDefen" title="查看得分表">查看得分表</a></li>
+				</ul>
+			</dd>
+		</dl>
+
+		<dl id="menu-article">
+			<dt><i class="Hui-iconfont">&#xe616;</i> 部门<i class="Hui-iconfont menu_dropdown-arrow">&#xe6d5;</i>
+			</dt>
+			<dd>
+				<ul>
+					<li><a href="/addBumen" title="导入教师">导入部门</a></li>
+					<li><a href="/getBumenAllinfo" title="查看教师表">查看部门表</a></li>
+					<li><a href="/getBumenGeifen" title="查看给分表">查看给分表</a></li>
+					<li><a href="/getBumenDefen" title="查看得分表">查看得分表</a></li>
+				</ul>
+			</dd>
+		</dl>
+
+
+	</div>
+</aside>
+<div class="dislpayArrow hidden-xs"><a class="pngfix" href="javascript:void(0);" onClick="displaynavbar(this)"></a>
+</div>
+{% endblock %}
+
+{% block  body_block %}
+<div id="main_box">
+	<form id="uploadForm" enctype="multipart/form-data" style="text-align: center;">
+		<div>
+			<input type="file" name="file" accept=".xlsx" value="">
+			<input type="button" value="上传" id="upFileBtn">
+		</div>
+	</form>
+</div>
+
+<script>
+	var up_file = function () {
+		var formData = new FormData($('#uploadForm')[0]);
+		$.ajax(
+			{
+				url: "/addTeacher",
+				type: "POST",
+				data: formData,
+				async: true,
+				cashe: false,
+				contentType: false,
+				processData: false,
+				success: function (returndata) {
+					alert(returndata)
+				},
+				error: function (returndata) {
+
+					alert("上传失败！")
+
+				}
+			})
+	}
+	$("#upFileBtn").click(up_file);
+</script>
+
+{% endblock %}
+
+{% block  script_block %}
+
+<script type="text/javascript" src="static/lib/datatables/1.10.15/jquery.dataTables.min.js"></script>
+
+<script type="text/javascript">
+	$(function () {
+		$('.table-sort').dataTable({
+			"aaSorting": [[1, "desc"]],//默认第几个排序
+			"bStateSave": true,//状态保存
+			"aoColumnDefs": [
+				//{"bVisible": false, "aTargets": [ 3 ]} //控制列的隐藏显示
+				// { "orderable": false, "aTargets": [0, 8, 9] }// 制定列不参与排序
+			]
+		});
+		$('.table-sort tbody').on('click', 'tr', function () {
+			if ($(this).hasClass('selected')) {
+				$(this).removeClass('selected');
+			}
+			else {
+				table.$('tr.selected').removeClass('selected');
+				$(this).addClass('selected');
+			}
+		});
+	});
+
+</script>
+
+{% endblock %}

@@ -1,0 +1,37 @@
+{% extends "addTeacher.html" %}
+
+
+{% block  body_block %}
+<div id="main_box">
+	<form id="uploadForm" enctype="multipart/form-data" style="text-align: center;">
+		<div>
+			<input type="file" name="file" accept=".xlsx" value="">
+			<input type="button" value="上传" id="upFileBtn">
+		</div>
+	</form>
+</div>
+<script>
+	var up_file = function () {
+		var formData = new FormData($('#uploadForm')[0]);
+		$.ajax(
+			{
+				url: "/addBumen",
+				type: "POST",
+				data: formData,
+				async: true,
+				cashe: false,
+				contentType: false,
+				processData: false,
+				success: function (returndata) {
+					alert(returndata)
+				},
+				error: function (returndata) {
+
+					alert("上传失败！")
+
+				}
+			})
+	}
+	$("#upFileBtn").click(up_file);
+</script>
+{% endblock %}

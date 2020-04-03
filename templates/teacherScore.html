@@ -1,0 +1,130 @@
+{% extends "index.html" %}
+
+{% block  body_block %}
+<section class="Hui-article-box">
+
+	<div class="Hui-article">
+
+		<table id="tab">
+			<tr>
+				<th>姓名</th>
+				<th>1</th>
+				<th>2</th>
+				<th>3</th>
+				<th>4</th>
+				<th>5</th>
+			</tr>
+
+		</table>
+
+		<script type="text/javascript">
+			$.ajax({
+				async: false,
+				type: 'POST',
+				url: '/getTeacherinfo',
+				data: {
+				},
+				dataType: 'json',
+				success: function (data, stats) {
+					if (data[0]['t_name'] == '已评分') {
+						alert("已评分");
+						$("#main_box").append('<input id="btn_chongxuan" class="btn btn-primary radius" type="submit" value="重选">')
+						return;
+					}
+					var names = new Array();
+					for (var i = 0, len = data.length; i < len; i++) {
+						// names[i] = data[i]['t_name'];
+						$("#tab").append("\
+							<tr><td>" + data[i]['t_name'] + "</td>\
+							<td>\
+								<input type='radio' name=1" + data[i]['t_id'] + " value='A'>A</input>\
+								<input type='radio' name=1" + data[i]['t_id'] + " value='B'>B</input>\
+								<input type='radio' name=1" + data[i]['t_id'] + " value='C'>C</input>\
+								<input type='radio' name=1" + data[i]['t_id'] + " value='D'>D</input>\
+							</td>\
+							<td>\
+								<input type='radio' name=2" + data[i]['t_id'] + " value='A'>A</input>\
+								<input type='radio' name=2" + data[i]['t_id'] + " value='B'>B</input>\
+								<input type='radio' name=2" + data[i]['t_id'] + " value='C'>C</input>\
+								<input type='radio' name=2" + data[i]['t_id'] + " value='D'>D</input>\
+							</td>\
+							<td>\
+								<input type='radio' name=3" + data[i]['t_id'] + " value='A'>A</input>\
+								<input type='radio' name=3" + data[i]['t_id'] + " value='B'>B</input>\
+								<input type='radio' name=3" + data[i]['t_id'] + " value='C'>C</input>\
+								<input type='radio' name=3" + data[i]['t_id'] + " value='D'>D</input>\
+							</td>\
+							<td>\
+								<input type='radio' name=4" + data[i]['t_id'] + " value='A'>A</input>\
+								<input type='radio' name=4" + data[i]['t_id'] + " value='B'>B</input>\
+								<input type='radio' name=4" + data[i]['t_id'] + " value='C'>C</input>\
+								<input type='radio' name=4" + data[i]['t_id'] + " value='D'>D</input>\
+							</td>\
+							<td>\
+								<input type='radio' name=5" + data[i]['t_id'] + " value='A'>A</input>\
+								<input type='radio' name=5" + data[i]['t_id'] + " value='B'>B</input>\
+								<input type='radio' name=5" + data[i]['t_id'] + " value='C'>C</input>\
+								<input type='radio' name=5" + data[i]['t_id'] + " value='D'>D</input>\
+							</td>\
+							</tr>\
+							");
+					}
+					$("#tab").append("<input type='submit' id='submit'></input>");
+					$("#submit").click(function () {
+						var o = new Object;
+						var inputs = $("input");
+						inputs.each(function () {
+							if (this.checked) {
+								o[this.name] = this.value
+							}
+						});
+
+						var json = JSON.stringify(o);
+						$.ajax({
+							async: true,
+							type: 'POST',
+							url: '/postTeacherScore',
+							data: {
+								json
+							},
+
+							success: function (data) {
+								alert(data);
+								if (data == 'success') { window.location.reload(); }
+							},
+							error: function () {
+								console.log('Wrong~');
+							}
+						});
+					});
+
+				},
+				error: function (XMLHttpRequest, textStatus, errorThrown) {
+					console.log('Wrong~');
+				}
+			}
+			);
+
+			$("#btn_chongxuan").click(function () {
+				$.ajax({
+					async: true,
+					type: 'POST',
+					url: '/clearTeacherGeifen',
+					data: {
+					},
+
+					success: function (data) {
+						alert(data);
+						if (data == 'success') { window.location.reload(); }
+					},
+					error: function () {
+						console.log('Wrong~');
+					}
+				});
+			});
+
+		</script>
+
+	</div>
+</section>
+{% endblock %}

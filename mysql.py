@@ -1,0 +1,165 @@
+import pymysql
+
+# 创建教师表
+Teacher = """
+create table Teacher(
+    t_id varchar(100) not null PRIMARY KEY,
+    t_name varchar(100) not null,
+    t_password varchar(100) not null,
+    bumen_id int not null,
+    zu_id int,
+    kind int not null,
+    count int not null,
+    count_bu int not null
+)
+"""
+# 创建部门表
+Bumen = """
+create table Bumen(
+    bumen_id int not null,
+    t_id varchar(100) not null,
+    bumen_name varchar(100) not null
+)
+"""
+
+
+# t_给分表
+t_geifen = '''
+create table t_geifen(
+    t_idfrom varchar(100) not null,
+    t_idto varchar(100) not null,
+    t_num1 int not null,
+    t_num2 int not null,
+    t_num3 int not null,
+    t_num4 int not null,
+    t_num5 int not null
+)
+'''
+
+# t_得分表
+t_defen = '''
+create table t_defen(
+    t_id varchar(100) not null PRIMARY KEY,
+    part1_score float not null,
+    part2_score float not null,
+    part3_score float not null,
+    score float not null,
+    foreign key(t_id) references Teacher(t_id) on delete cascade on update cascade
+);
+
+'''
+
+# bu_给分表
+bu_geifen = '''
+create table bu_geifen(
+    bumen_id int not null,
+    t_id varchar(100) not null,
+    num1 float not null,
+    num2 float not null,
+    num3 float not null,
+    num4 float not null,
+    foreign key(t_id) references Teacher(t_id) on delete cascade on update cascade
+    )
+'''
+
+# bu_得分表
+bu_defen = '''
+create table bu_defen(
+    bumen_id int not null,
+    part1_score float not null,
+    part2_score float not null,
+    score float not null
+    )
+'''
+class Sql:
+    def __init__(self):
+        self.db=pymysql.connect(host='localhost',  # 指定连接本地服务器
+                         user='root',    # 登录服务器 用的用户名
+                         password='yangning',  # 登录服务器用的密码
+                         database='YANGNING',    # 指定目标数据库
+                         charset='utf8')
+        # 规定返回的值为字典类型，否则默认返回元组类型
+        self.cursor=self.db.cursor(cursor=pymysql.cursors.DictCursor)
+        
+    def __del__(self):
+        # 关闭数据库连接
+        self.db.close()
+
+    def sqlstr(self,sql_str):
+        try:
+            # 执行sql语句
+            self.cursor.execute(sql_str)
+            # 提交到数据库执行
+            self.db.commit()
+        except Exception as err:
+            # 如果发生错误则回滚
+            self.db.rollback()
+            raise err
+    
+    def search(self,sql_str):
+        try:
+            # 执行SQL语句
+            self.cursor.execute(sql_str)
+            # 获取所有记录列表
+            results = self.cursor.fetchall()
+            return results
+        except Exception as err:
+            self.db.rollback()
+            raise err
+
+    def init_table(self):
+        try:
+            # 执行sql语句
+            self.cursor.execute(Teacher)
+            self.cursor.execute(Bumen)
+            self.cursor.execute(t_geifen)
+            self.cursor.execute(t_defen)
+            self.cursor.execute(bu_geifen)
+            self.cursor.execute(bu_defen)
+
+            # 提交到数据库执行
+            self.db.commit()
+        except Exception as err:
+            # 如果发生错误则回滚
+            self.db.rollback()
+            raise err
+
+
+if __name__ == "__main__":
+    '''
+    # 建库
+    '''
+    # try:
+    #     conn=pymysql.connect(
+    #         host='localhost',
+    #         user='root',
+    #         passwd='yangning',
+    #     )
+    #     cur=conn.cursor()
+    #     create_database_sql='CREATE DATABASE IF NOT EXISTS yangning DEFAULT CHARSET utf8 COLLATE utf8_general_ci;'
+    #     cur.execute(create_database_sql)
+    #     cur.close()
+    #     print('创建数据库 yangning 成功！')
+    # except pymysql.Error as e:
+    #     print('pymysql.Error: ',e.args[0],e.args[1])
+
+    
+    '''
+    建表
+    '''
+    s=Sql()
+    try:
+        # 执行sql语句
+        # s.cursor.execute(Teacher)
+        # s.cursor.execute(Bumen)
+        # s.cursor.execute(t_geifen)
+        # s.cursor.execute(t_defen)
+        s.cursor.execute(bu_geifen)
+        # s.cursor.execute(bu_defen)
+
+        # 提交到数据库执行
+        s.db.commit()
+    except Exception as err:
+        # 如果发生错误则回滚
+        s.db.rollback()
+        raise err
