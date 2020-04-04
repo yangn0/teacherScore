@@ -82,7 +82,15 @@ def getTeacherinfo():
     if(r[0]['count'] == 0):
         return jsonify([{'t_name': "已评分"}])
 
-    if(session['user']['kind'] == 1):
+    # -----------------------------------------------------------------------申静-------------------------------------------------------
+    sj_ids = []
+    sjid = 1
+    if(session['user']['t_id'] in sj_ids):
+        r = s.search('''
+            SELECT t_name,t_id FROM TEACHER WHERE t_id=%s
+        ''' % sjid)
+
+    elif(session['user']['kind'] == 1):
         r = s.search('''
             SELECT t_name,t_id FROM TEACHER WHERE (kind=2 or kind=3) and bumen_id=%s
         ''' % session['user']['bumen_id'])
@@ -90,6 +98,7 @@ def getTeacherinfo():
         r = s.search('''
             SELECT t_name,t_id FROM TEACHER WHERE (kind=2 or kind=3)
         ''')
+
     return jsonify(r)
 
 
@@ -202,7 +211,8 @@ def postTeacherScore():
         count_t = s.search("SELECT COUNT(*) FROM TEACHER WHERE (kind=2 or kind=3) and bumen_id=%s"
                            % session['user']['bumen_id'])[0]['COUNT(*)']
     else:
-        count_t = s.search("SELECT COUNT(*) FROM TEACHER WHERE kind=2 or kind=3")[0]['COUNT(*)']
+        count_t = s.search(
+            "SELECT COUNT(*) FROM TEACHER WHERE kind=2 or kind=3")[0]['COUNT(*)']
 
     if len(d2) != int(count_t):
         return "提交出错！请检查是否有空项"
@@ -560,8 +570,9 @@ def collectBumenScore():
 
         # 部门权重
         part1_score = zhengchu_avg*0.6
-        part2_score = xiaojizhixi_avg*0.1+xiaoji_avg*0.3
         # 直属0.1 非直属0.3
+        #part2_score = xiaojizhixi_avg*0.1+xiaoji_avg*0.3
+        part2_score = (xiaojizhixi_avg+xiaoji_avg)*0.4
         score = part1_score+part2_score
         s.sqlstr('''
         INSERT INTO bu_defen(
@@ -632,7 +643,7 @@ def outputBumenGeifen():
     return send_file(src)
 
 
-@app.route('/clearTeacherGeifen', methods=['POST','GET'])
+@app.route('/clearTeacherGeifen', methods=['POST', 'GET'])
 @wrapper
 def clearTeacherGeifen():
     s = mysql.Sql()
@@ -643,10 +654,10 @@ def clearTeacherGeifen():
     return "success"
 
 
-@app.route('/clearBumenGeifen', methods=['POST',"GET"])
+@app.route('/clearBumenGeifen', methods=['POST', "GET"])
 @wrapper
 def clearBumenGeifen():
-    if(session['user']['kind']!=3 and session['user']['kind']!=4):
+    if(session['user']['kind'] != 3 and session['user']['kind'] != 4):
         return "无权限"
     s = mysql.Sql()
     s.sqlstr("DELETE FROM bu_geifen where t_id=%s" %
@@ -654,6 +665,7 @@ def clearBumenGeifen():
     s.sqlstr("UPDATE teacher SET count_bu = 1 where t_id=%s" %
              session['user']['t_id'])
     return "success"
+
 
 if __name__ == '__main__':
     app.run(debug=True)
