@@ -1,7 +1,9 @@
 @charset "utf-8";
 /* 你自己的样式 */
 
-#main_box
-{
-    padding: 100px;
+th{
+    font-size: 16px;
+}
+tr td{
+    font-size: 16px;
 }

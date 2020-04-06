@@ -1,41 +1,59 @@
 {% extends "index.html" %}
 
 {% block  body_block %}
-<section class="Hui-article-box">
 
-	<div class="Hui-article">
 
-		<table id="tab">
-			<tr>
-				<th>部门名称</th>
-				<th>1</th>
-				<th>2</th>
-				<th>3</th>
-				<th>4</th>
-				<th>求和</th>
-			</tr>
+<div class="Hui-article">
+	<article class="cl pd-20">
 
-		</table>
+		<div class="mt-20">
+			<table class="table table-border table-bordered table-hover table-bg table-sort">
+				<thead>
+					<tr class="text-c">
 
-		<script type="text/javascript">
-			$.ajax({
-				async: false,
-				type: 'POST',
-				url: '/getBumeninfo',
-				data: {
-				},
-				dataType: 'json',
-				success: function (data, stats) {
-					if (data[0]['bumen_name'] == '已评分') {
-						alert("已评分");
-						$("#main_box").append('<input id="btn_chongxuan" class="btn btn-primary radius" type="submit" value="重选">')
-						return;
-					}
-					var names = new Array();
-					for (var i = 0, len = data.length; i < len; i++) {
-						// names[i] = data[i]['t_name'];
-						$("#tab").append("\
-							<tr><td>" + data[i]['bumen_name'] + "</td>\
+						<th width="80">部门名称</th>
+						<th width="80">
+							职能绩效目标（满分60分）
+						</th>
+						<th width="80">党建目标（满分15分）</th>
+						<th width="80">
+							作风评议（满分10分）
+						</th>
+						<th width="80">
+							党风廉政建设（满分15分）
+						</th>
+						<th width="80">
+							合计（满分100分）
+						</th>
+					</tr>
+				</thead>
+				<tbody id="tab">
+
+				</tbody>
+			</table>
+		</div>
+	</article>
+
+
+	<script type="text/javascript">
+		$.ajax({
+			async: false,
+			type: 'POST',
+			url: '/getBumeninfo',
+			data: {
+			},
+			dataType: 'json',
+			success: function (data, stats) {
+				if (data[0]['bumen_name'] == '已评分') {
+					alert("已评分");
+					$(".Hui-article").append('<input id="btn_chongxuan" class="btn btn-primary radius" type="submit" value="重选">')
+					return;
+				}
+				var names = new Array();
+				for (var i = 0, len = data.length; i < len; i++) {
+					// names[i] = data[i]['t_name'];
+					$("#tab").append("\
+							<tr class='text-c'><td>" + data[i]['bumen_name'] + "</td>\
 							<td>\
 								<input class='input_f' type='text' name=1"+ data[i]['bumen_id'] + "></input>\
 							</td>\
@@ -53,76 +71,76 @@
 							</td>\
 							</tr>\
 							");
-					}
-					$("#tab").append("<input type='submit' id='submit'></input>");
-					$("#tab").append("<input type='submit' id='sum' value='求和'></input>");
-					$("#sum").click(function () {
+				}
+				$(".Hui-article").append("<input class='btn btn-primary radius'  type='submit' id='submit' value='提交></input>");
+				$(".Hui-article").append("<input class='btn btn-primary radius' type='submit' id='sum' value='求和'></input>");
+				$("#sum").click(function () {
 
-						var inputs = $("#tab>tr");
-						inputs.each(function () {
-							var input_fs;
-							var sum=0;
-							input_fs=$(this).find(".input_f");
-							for(var i=0;i<4;i++){
-								sum+=parseFloat(input_fs[i].value);
-							}
-							$(this).find(".input_sum").val(sum);
-						});
-
-					});
-					$("#submit").click(function () {
-						var o = new Object;
-						var inputs = $("input[type='text']");
-						inputs.each(function () {
-
-							o[this.name] = this.value
-
-						});
-
-						var json = JSON.stringify(o);
-						$.ajax({
-							async: true,
-							type: 'POST',
-							url: '/postBumenScore',
-							data: {
-								json
-							},
-
-							success: function (data) {
-								alert(data);
-								if (data == 'success') { window.location.reload(); }
-							},
-							error: function () {
-								console.log('Wrong~');
-							}
-						});
+					var inputs = $("#tab>tr");
+					inputs.each(function () {
+						var input_fs;
+						var sum = 0;
+						input_fs = $(this).find(".input_f");
+						for (var i = 0; i < 4; i++) {
+							sum += parseFloat(input_fs[i].value);
+						}
+						$(this).find(".input_sum").val(sum);
 					});
 
+				});
+				$("#submit").click(function () {
+					var o = new Object;
+					var inputs = $("input[type='text']");
+					inputs.each(function () {
+
+						o[this.name] = this.value
+
+					});
+
+					var json = JSON.stringify(o);
+					$.ajax({
+						async: true,
+						type: 'POST',
+						url: '/postBumenScore',
+						data: {
+							json
+						},
+
+						success: function (data) {
+							alert(data);
+							if (data == 'success') { window.location.reload(); }
+						},
+						error: function () {
+							console.log('Wrong~');
+						}
+					});
+				});
+
+			},
+			error: function (XMLHttpRequest, textStatus, errorThrown) {
+				console.log('Wrong~');
+			}
+		}
+		);
+		$("#btn_chongxuan").click(function () {
+			$.ajax({
+				async: true,
+				type: 'POST',
+				url: '/clearBumenGeifen',
+				data: {
 				},
-				error: function (XMLHttpRequest, textStatus, errorThrown) {
+
+				success: function (data) {
+					alert(data);
+					if (data == 'success') { window.location.reload(); }
+				},
+				error: function () {
 					console.log('Wrong~');
 				}
-			}
-			);
-			$("#btn_chongxuan").click(function () {
-				$.ajax({
-					async: true,
-					type: 'POST',
-					url: '/clearBumenGeifen',
-					data: {
-					},
-
-					success: function (data) {
-						alert(data);
-						if (data == 'success') { window.location.reload(); }
-					},
-					error: function () {
-						console.log('Wrong~');
-					}
-				});
 			});
-		</script>
+		});
+	</script>
 
-	</div>
-</section>
+</div>
+
 {% endblock %}

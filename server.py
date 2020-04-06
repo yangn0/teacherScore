@@ -83,8 +83,8 @@ def getTeacherinfo():
         return jsonify([{'t_name': "已评分"}])
 
     # -----------------------------------------------------------------------申静-------------------------------------------------------
-    sj_ids = []
-    sjid = 1
+    sj_ids = [1944,1963]
+    sjid = 1034
     if(session['user']['t_id'] in sj_ids):
         r = s.search('''
             SELECT t_name,t_id FROM TEACHER WHERE t_id=%s

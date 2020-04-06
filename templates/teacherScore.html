@@ -1,41 +1,58 @@
 {% extends "index.html" %}
 
 {% block  body_block %}
-<section class="Hui-article-box">
 
-	<div class="Hui-article">
+<div class="Hui-article">
+	<article class="cl pd-20">
 
-		<table id="tab">
-			<tr>
-				<th>姓名</th>
-				<th>1</th>
-				<th>2</th>
-				<th>3</th>
-				<th>4</th>
-				<th>5</th>
-			</tr>
+		<div class="mt-20">
+			<table class="table table-border table-bordered table-hover table-bg table-sort">
+				<thead>
+					<tr class="text-c">
 
-		</table>
+						<th width="80">姓名</th>
+						<th width="80">
+							德。全面考核领导干部政治品质和道德品行。考核领导干部的政治品质，重点了解坚定理想信念、对党忠诚、尊崇党章、遵守政治纪律和政治规矩，在思想上政治上行动上同以习近平同志为核心的党中央保持高度一致等情况。考核领导干部的道德品行，重点了解坚守忠诚老实、公道正派、实事求是、清正廉洁等价值观，遵守社会公德、职业道德、家庭美德和个人品德等情况。
+						</th>
+						<th width="80">能。全面考核领导干部履职尽责特别是应对突发事件、群体性事件过程中的政治能力、专业素养和组织领导能力等情况。</th>
+						<th width="80">
+							勤。全面考核领导干部的精神状态和工作作风，重点了解发扬革命精神、斗争精神，坚持“三严三实”，勤勉敬业、恪尽职守，认真负责、紧抓快办，锐意进取、敢于担当，艰苦奋斗、甘于奉献等情况。
+						</th>
+						<th width="80">
+							绩。全面考核领导干部坚持正确政绩观，履职尽责、完成日常工作、承担急难险重任务、处理复杂问题、应对重大考验的情况和实际成效。考核党委（党组）书记的工作实绩，首先看抓党建工作的成效，考核领导班子其他党员领导干部的工作实绩应当加大抓党建工作的权重。
+						</th>
+						<th width="80">
+							廉。全面考核领导干部落实党风廉政建设“一岗双责”政治责任，遵守廉洁自律准则，带头落实中央八项规定及其实施细则精神，秉公用权，树立良好家风，严格要求亲属和身边工作人员，反对“四风”和特权思想、特权现象等情况。
+						</th>
+					</tr>
+				</thead>
+				<tbody id="tab">
 
-		<script type="text/javascript">
-			$.ajax({
-				async: false,
-				type: 'POST',
-				url: '/getTeacherinfo',
-				data: {
-				},
-				dataType: 'json',
-				success: function (data, stats) {
-					if (data[0]['t_name'] == '已评分') {
-						alert("已评分");
-						$("#main_box").append('<input id="btn_chongxuan" class="btn btn-primary radius" type="submit" value="重选">')
-						return;
-					}
-					var names = new Array();
-					for (var i = 0, len = data.length; i < len; i++) {
-						// names[i] = data[i]['t_name'];
-						$("#tab").append("\
-							<tr><td>" + data[i]['t_name'] + "</td>\
+				</tbody>
+			</table>
+		</div>
+	</article>
+
+	<script type="text/javascript">
+		$.ajax({
+			async: false,
+			type: 'POST',
+			url: '/getTeacherinfo',
+			data: {
+			},
+			dataType: 'json',
+			success: function (data, stats) {
+				if (data[0]['t_name'] == '已评分') {
+					alert("已评分");
+					$(".Hui-article").append('<input id="btn_chongxuan" class="btn btn-primary radius" type="submit" value="重选">')
+					return;
+				}
+				var names = new Array();
+				for (var i = 0, len = data.length; i < len; i++) {
+					// names[i] = data[i]['t_name'];
+					$("#tab").append("\
+							<tr class='text-c'>\
+							<td>" + data[i]['t_name'] + "</td>\
 							<td>\
 								<input type='radio' name=1" + data[i]['t_id'] + " value='A'>A</input>\
 								<input type='radio' name=1" + data[i]['t_id'] + " value='B'>B</input>\
@@ -68,63 +85,62 @@
 							</td>\
 							</tr>\
 							");
-					}
-					$("#tab").append("<input type='submit' id='submit'></input>");
-					$("#submit").click(function () {
-						var o = new Object;
-						var inputs = $("input");
-						inputs.each(function () {
-							if (this.checked) {
-								o[this.name] = this.value
-							}
-						});
-
-						var json = JSON.stringify(o);
-						$.ajax({
-							async: true,
-							type: 'POST',
-							url: '/postTeacherScore',
-							data: {
-								json
-							},
-
-							success: function (data) {
-								alert(data);
-								if (data == 'success') { window.location.reload(); }
-							},
-							error: function () {
-								console.log('Wrong~');
-							}
-						});
+				}
+				$(".Hui-article").append("<input class='btn btn-primary radius'  type='submit' id='submit' value='提交'>");
+				$("#submit").click(function () {
+					var o = new Object;
+					var inputs = $("input");
+					inputs.each(function () {
+						if (this.checked) {
+							o[this.name] = this.value
+						}
 					});
 
+					var json = JSON.stringify(o);
+					$.ajax({
+						async: true,
+						type: 'POST',
+						url: '/postTeacherScore',
+						data: {
+							json
+						},
+
+						success: function (data) {
+							alert(data);
+							if (data == 'success') { window.location.reload(); }
+						},
+						error: function () {
+							console.log('Wrong~');
+						}
+					});
+				});
+
+			},
+			error: function (XMLHttpRequest, textStatus, errorThrown) {
+				console.log('Wrong~');
+			}
+		}
+		);
+
+		$("#btn_chongxuan").click(function () {
+			$.ajax({
+				async: true,
+				type: 'POST',
+				url: '/clearTeacherGeifen',
+				data: {
 				},
-				error: function (XMLHttpRequest, textStatus, errorThrown) {
+
+				success: function (data) {
+					alert(data);
+					if (data == 'success') { window.location.reload(); }
+				},
+				error: function () {
 					console.log('Wrong~');
 				}
-			}
-			);
-
-			$("#btn_chongxuan").click(function () {
-				$.ajax({
-					async: true,
-					type: 'POST',
-					url: '/clearTeacherGeifen',
-					data: {
-					},
-
-					success: function (data) {
-						alert(data);
-						if (data == 'success') { window.location.reload(); }
-					},
-					error: function () {
-						console.log('Wrong~');
-					}
-				});
 			});
+		});
 
-		</script>
+	</script>
 
-	</div>
-</section>
+</div>
 {% endblock %}
