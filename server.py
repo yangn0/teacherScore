@@ -461,6 +461,8 @@ def postBumenScore():
     for i in d:
         if(i[1:] not in d2):
             d2[i[1:]] = dict()
+        if(d[i]==''):
+             return "提交出错！请检查是否有空项"
         d2[i[1:]][i[0]] = float(d[i])
 
     s = mysql.Sql()
