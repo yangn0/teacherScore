@@ -58,7 +58,7 @@ def output_excel(d,name):
             m+=1
         n+=1
     wb.save("output/"+name+".xlsx")
-    return "output/"+name+".xlsx"
+    return name+".xlsx"
 
 
 if __name__ =="__main__":

@@ -1,6 +1,6 @@
 from flask import Flask, request, jsonify
 from flask import render_template
-from flask import redirect, render_template, session, send_file
+from flask import redirect, render_template, session, send_file,send_from_directory
 from functools import wraps
 import json
 import mysql
@@ -597,7 +597,7 @@ def outputTeacher():
     s = mysql.Sql()
     r = s.search("SELECT * FROM TEACHER")
     src = excel.output_excel(r, 'teacher')
-    return send_file(src)
+    return send_from_directory('output',src,as_attachment=True)
 
 
 @app.route('/outputTeacherDefen', methods=['GET'])
@@ -606,7 +606,7 @@ def outputTeacherDefen():
     s = mysql.Sql()
     r = s.search("SELECT * FROM t_defen")
     src = excel.output_excel(r, 'TeacherDefen')
-    return send_file(src)
+    return send_from_directory('output',src,as_attachment=True)
 
 
 @app.route('/outputTeacherGeifen', methods=['GET'])
@@ -615,7 +615,7 @@ def outputTeacherGeifen():
     s = mysql.Sql()
     r = s.search("SELECT * FROM t_geifen")
     src = excel.output_excel(r, 'TeacherGeifen')
-    return send_file(src)
+    return send_from_directory('output',src,as_attachment=True)
 
 
 @app.route('/outputBumen', methods=['GET'])
@@ -624,7 +624,7 @@ def outputBumen():
     s = mysql.Sql()
     r = s.search("SELECT * FROM bumen")
     src = excel.output_excel(r, 'Bumen')
-    return send_file(src)
+    return send_from_directory('output',src,as_attachment=True)
 
 
 @app.route('/outputBumenDefen', methods=['GET'])
@@ -633,7 +633,7 @@ def outputBumenDefen():
     s = mysql.Sql()
     r = s.search("SELECT * FROM bu_defen")
     src = excel.output_excel(r, 'BumenDefen')
-    return send_file(src)
+    return send_from_directory('output',src,as_attachment=True)
 
 
 @app.route('/outputBumenGeifen', methods=['GET'])
@@ -642,7 +642,7 @@ def outputBumenGeifen():
     s = mysql.Sql()
     r = s.search("SELECT * FROM bu_geifen")
     src = excel.output_excel(r, 'BumenGeifen')
-    return send_file(src)
+    return send_from_directory('output',src,as_attachment=True)
 
 
 @app.route('/clearTeacherGeifen', methods=['POST', 'GET'])

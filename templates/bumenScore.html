@@ -82,9 +82,13 @@
 						var sum = 0;
 						input_fs = $(this).find(".input_f");
 						for (var i = 0; i < 4; i++) {
+							if(isNaN(input_fs[i].value)){
+								alert("输入不规范");
+								input_fs[i].value = '';
+							}
 							sum += parseFloat(input_fs[i].value);
-							if (parseFloat(input_fs[i].value) > parseInt($(input_fs[i]).attr('id'))) {
-								alert("不能大于" + parseInt($(input_fs[i]).attr('id')) + "分");
+							if (parseFloat(input_fs[i].value) > parseInt($(input_fs[i]).attr('id')) || parseFloat(input_fs[i].value)<0) {
+								alert("不在评分区间");
 								input_fs[i].value = '';
 
 							}
