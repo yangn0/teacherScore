@@ -55,16 +55,16 @@
 					$("#tab").append("\
 							<tr class='text-c'><td>" + data[i]['bumen_name'] + "</td>\
 							<td>\
-								<input class='input_f' type='text' name=1"+ data[i]['bumen_id'] + "></input>\
+								<input id='60' class='input_f' type='text' name=1"+ data[i]['bumen_id'] + "></input>\
 							</td>\
 							<td>\
-								<input class='input_f' type='text' name=2"+ data[i]['bumen_id'] + " ></input>\
+								<input id='15' class='input_f' type='text' name=2"+ data[i]['bumen_id'] + " ></input>\
 							</td>\
 							<td>\
-								<input class='input_f' type='text' name=3"+ data[i]['bumen_id'] + " ></input>\
+								<input id='10' class='input_f' type='text' name=3"+ data[i]['bumen_id'] + " ></input>\
 							</td>\
 							<td>\
-								<input class='input_f' type='text' name=4"+ data[i]['bumen_id'] + " ></input>\
+								<input id='15' class='input_f' type='text' name=4"+ data[i]['bumen_id'] + " ></input>\
 							</td>\
 							<td>\
 								<input class='input_sum' type='submit' name='5"+ data[i]['bumen_id'] + "' value='' disabled='false'/>\
@@ -73,7 +73,8 @@
 							");
 				}
 				$(".Hui-article").append("<input class='btn btn-primary radius' type='submit' id='submit' value='提交' />");
-				$("input").on("change",(function () {
+
+				$("input").on("change", (function () {
 
 					var inputs = $("#tab>tr");
 					inputs.each(function () {
@@ -82,8 +83,14 @@
 						input_fs = $(this).find(".input_f");
 						for (var i = 0; i < 4; i++) {
 							sum += parseFloat(input_fs[i].value);
+							if (parseFloat(input_fs[i].value) > parseInt($(input_fs[i]).attr('id'))) {
+								alert("不能大于" + parseInt($(input_fs[i]).attr('id')) + "分");
+								input_fs[i].value = '';
+
+							}
 						}
 						$(this).find(".input_sum").val(sum);
+
 					});
 
 				}));
