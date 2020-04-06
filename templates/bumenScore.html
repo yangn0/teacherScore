@@ -72,9 +72,8 @@
 							</tr>\
 							");
 				}
-				$(".Hui-article").append("<input class='btn btn-primary radius'  type='submit' id='submit' value='提交></input>");
-				$(".Hui-article").append("<input class='btn btn-primary radius' type='submit' id='sum' value='求和'></input>");
-				$("#sum").click(function () {
+				$(".Hui-article").append("<input class='btn btn-primary radius' type='submit' id='submit' value='提交' />");
+				$("input").on("change",(function () {
 
 					var inputs = $("#tab>tr");
 					inputs.each(function () {
@@ -87,7 +86,7 @@
 						$(this).find(".input_sum").val(sum);
 					});
 
-				});
+				}));
 				$("#submit").click(function () {
 					var o = new Object;
 					var inputs = $("input[type='text']");
