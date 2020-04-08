@@ -22,7 +22,8 @@ def get_teachers(s):
         Data6 = table.cell(row=i, column=6).value
         Data7 = table.cell(row=i, column=7).value
         Data8 = table.cell(row=i, column=8).value
-        d[Data1]=[Data2,Data3,Data4,Data5,Data6,Data7,Data8]
+        Data9 = table.cell(row=i, column=9).value
+        d[Data1]=[Data2,Data3,Data4,Data5,Data6,Data7,Data8,Data9]
     return d
 def get_bumen(s):
     wb = load_workbook(s)
@@ -40,7 +41,8 @@ def get_bumen(s):
         Data1 = table.cell(row=i, column=1).value
         Data2 = table.cell(row=i, column=2).value
         Data3 = table.cell(row=i, column=3).value
-        d[Data1]=[Data2,Data3]
+        Data4 = table.cell(row=i, column=4).value
+        d[Data1]=[Data2,Data3,Data4]
     return d
 
 def output_excel(d,name):

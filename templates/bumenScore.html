@@ -1,5 +1,31 @@
 {% extends "index.html" %}
 
+{% block  _menu %}
+<aside class="Hui-aside">
+
+	<div class="menu_dropdown bk_2">
+		<dl id="menu-article">
+			<dt><i class="Hui-iconfont">&#xe616;</i> 评分<i class="Hui-iconfont menu_dropdown-arrow">&#xe6d5;</i>
+			</dt>
+			<dd>
+				<ul>
+					<li><a href="/teacherScore" title="处级评分">处级评分</a></li>
+					<li><a href="/bumenScore" title="部门评分">部门评分</a></li>
+				</ul>
+			</dd>
+		</dl>
+
+	</div>
+
+	<p style="padding: 40px;text-indent: 2em;">
+		打分以实分值打分：优秀（90分-100分），较好（80分-89分），一般（60分-79分），不合格（60分以下）。
+	</p>
+</aside>
+<div class="dislpayArrow hidden-xs"><a class="pngfix" href="javascript:void(0);" onClick="displaynavbar(this)"></a>
+</div>
+
+{% endblock %}
+
 {% block  body_block %}
 
 
@@ -10,7 +36,7 @@
 			<table class="table table-border table-bordered table-hover table-bg table-sort">
 				<thead>
 					<tr class="text-c">
-
+						<th width="80">序号</th>
 						<th width="80">部门名称</th>
 						<th width="80">
 							职能绩效目标（满分60分）
@@ -44,16 +70,18 @@
 			},
 			dataType: 'json',
 			success: function (data, stats) {
-				if (data[0]['bumen_name'] == '已评分') {
-					alert("已评分");
-					$(".Hui-article").append('<input id="btn_chongxuan" class="btn btn-primary radius" type="submit" value="重选">')
+				if (data[0]['bumen_name'] == '已评分或无权限') {
+					alert("已评分或无权限");
+					// $(".Hui-article").append('<input id="btn_chongxuan" class="btn btn-primary radius" type="submit" value="重选">')
 					return;
 				}
 				var names = new Array();
 				for (var i = 0, len = data.length; i < len; i++) {
 					// names[i] = data[i]['t_name'];
 					$("#tab").append("\
-							<tr class='text-c'><td>" + data[i]['bumen_name'] + "</td>\
+							<tr class='text-c'>\
+							<td>" + data[i]['order1'] + "</td>\
+							<td>" + data[i]['bumen_name'] + "</td>\
 							<td>\
 								<input id='60' class='input_f' type='text' name=1"+ data[i]['bumen_id'] + "></input>\
 							</td>\
@@ -72,7 +100,7 @@
 							</tr>\
 							");
 				}
-				$(".Hui-article").append("<input class='btn btn-primary radius' type='submit' id='submit' value='提交' />");
+				$(".Hui-article").append("<input style='margin:0 auto;display:block;    margin-bottom: 50px;' class='btn btn-primary radius'  type='submit' id='submit' value='提交'>");
 
 				$("input").on("change", (function () {
 
@@ -82,14 +110,22 @@
 						var sum = 0;
 						input_fs = $(this).find(".input_f");
 						for (var i = 0; i < 4; i++) {
+							if(input_fs[i].value!=''){
+								input_fs[i].style.backgroundColor="#5a98de";
+							}
+							if(input_fs[i].value==''){
+								input_fs[i].style.backgroundColor="white";
+							}
 							if(isNaN(input_fs[i].value)){
 								alert("输入不规范");
 								input_fs[i].value = '';
+								input_fs[i].style.backgroundColor="white";
 							}
 							sum += parseFloat(input_fs[i].value);
 							if (parseFloat(input_fs[i].value) > parseInt($(input_fs[i]).attr('id')) || parseFloat(input_fs[i].value)<0) {
 								alert("不在评分区间");
 								input_fs[i].value = '';
+								input_fs[i].style.backgroundColor="white";
 
 							}
 						}
@@ -118,7 +154,7 @@
 
 						success: function (data) {
 							alert(data);
-							if (data == 'success') { window.location.reload(); }
+							if (data == '提交完成') { window.location.reload(); }
 						},
 						error: function () {
 							console.log('Wrong~');
@@ -142,7 +178,7 @@
 
 				success: function (data) {
 					alert(data);
-					if (data == 'success') { window.location.reload(); }
+					if (data == '提交完成') { window.location.reload(); }
 				},
 				error: function () {
 					console.log('Wrong~');
@@ -153,4 +189,24 @@
 
 </div>
 
+{% endblock %}
+
+{% block  script_block %}
+<script type="text/javascript" src="static/lib/datatables/1.10.15/jquery.dataTables.min.js"></script>
+
+<script type="text/javascript">
+	$(function () {
+		$('.table-sort').dataTable({
+			"paging": false,
+			"aaSorting": [0, "asc"],//默认第几个排序 asc desc
+			"bStateSave": false,//状态保存
+			"aoColumnDefs": [
+				{ "bVisible": false, "aTargets": [0] } //控制列的隐藏显示
+				// { "orderable": false, "aTargets": [0, 8, 9] }// 制定列不参与排序
+			]
+		});
+
+	});
+
+</script>
 {% endblock %}

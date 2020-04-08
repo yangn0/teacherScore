@@ -10,15 +10,24 @@ create table Teacher(
     zu_id int,
     kind int not null,
     count int not null,
-    count_bu int not null
-)
+    count_bu int not null,
+    order1 int
+    )
 """
+
+Teacher_admin = """INSERT INTO TEACHER(t_id,t_name,t_password, bumen_id, zu_id, kind,count,count_bu) VALUES ("%s","%s", "%s", %s, %s ,%s,%s,%s)
+""" % (
+    'admin', 'admin', '123456', 0, 0, 0, 0, 0
+)
+
+
 # 创建部门表
 Bumen = """
 create table Bumen(
     bumen_id int not null,
     t_id varchar(100) not null,
-    bumen_name varchar(100) not null
+    bumen_name varchar(100) not null,
+    order1 int
 )
 """
 
@@ -71,21 +80,23 @@ create table bu_defen(
     score float not null
     )
 '''
+
+
 class Sql:
     def __init__(self):
-        self.db=pymysql.connect(host='localhost',  # 指定连接本地服务器
-                         user='root',    # 登录服务器 用的用户名
-                         password='yangning',  # 登录服务器用的密码
-                         database='YANGNING',    # 指定目标数据库
-                         charset='utf8')
+        self.db = pymysql.connect(host='localhost',  # 指定连接本地服务器
+                                  user='root',    # 登录服务器 用的用户名
+                                  password='yangning',  # 登录服务器用的密码
+                                  database='YANGNING',    # 指定目标数据库
+                                  charset='utf8')
         # 规定返回的值为字典类型，否则默认返回元组类型
-        self.cursor=self.db.cursor(cursor=pymysql.cursors.DictCursor)
-        
+        self.cursor = self.db.cursor(cursor=pymysql.cursors.DictCursor)
+
     def __del__(self):
         # 关闭数据库连接
         self.db.close()
 
-    def sqlstr(self,sql_str):
+    def sqlstr(self, sql_str):
         try:
             # 执行sql语句
             self.cursor.execute(sql_str)
@@ -95,8 +106,8 @@ class Sql:
             # 如果发生错误则回滚
             self.db.rollback()
             raise err
-    
-    def search(self,sql_str):
+
+    def search(self, sql_str):
         try:
             # 执行SQL语句
             self.cursor.execute(sql_str)
@@ -143,19 +154,19 @@ if __name__ == "__main__":
     # except pymysql.Error as e:
     #     print('pymysql.Error: ',e.args[0],e.args[1])
 
-    
     '''
     建表
     '''
-    s=Sql()
+    s = Sql()
     try:
         # 执行sql语句
-        # s.cursor.execute(Teacher)
-        # s.cursor.execute(Bumen)
-        # s.cursor.execute(t_geifen)
-        # s.cursor.execute(t_defen)
+        s.cursor.execute(Teacher)
+        s.cursor.execute(Teacher_admin)
+        s.cursor.execute(Bumen)
+        s.cursor.execute(t_geifen)
+        s.cursor.execute(t_defen)
         s.cursor.execute(bu_geifen)
-        # s.cursor.execute(bu_defen)
+        s.cursor.execute(bu_defen)
 
         # 提交到数据库执行
         s.db.commit()

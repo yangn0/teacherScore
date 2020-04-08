@@ -1,6 +1,6 @@
 from flask import Flask, request, jsonify
 from flask import render_template
-from flask import redirect, render_template, session, send_file,send_from_directory
+from flask import redirect, render_template, session, send_file, send_from_directory
 from functools import wraps
 import json
 import mysql
@@ -40,24 +40,36 @@ def login():
         return render_template('login.html')
     t_id = request.form['t_id']
     password = request.form['password']
-    # 接入管理员端
-    if(t_id == 'admin' and password == '123456'):
-        session["user"] = {'t_name': 'admin'}
-        return redirect("/addTeacher")
     s = mysql.Sql()
     r = s.search('''
-        SELECT * FROM TEACHER WHERE t_id=%s and t_password=%s
+        SELECT * FROM TEACHER WHERE t_id='%s' and t_password='%s'
     ''' % (t_id, password))
     if(len(r) == 0):
         return "工号或密码错误"
     session["user"] = r[0]
+    # 接入管理员端
+    if(r[0]['kind'] == 0):
+        return redirect("/addTeacher")
     return redirect("/index")
+
+
+@app.route('/changePwd', methods=['GET', 'POST'])
+@wrapper
+def changePwd():
+    if(request.method == "GET"):
+        return render_template('changePwd.html')
+    pwd = request.form['pwd']
+    s = mysql.Sql()
+    r = s.sqlstr('''
+        UPDATE TEACHER SET t_password = %s where t_id='%s'
+    ''' % (pwd, session['user']['t_id']))
+    return '提交完成'
 
 
 @app.route('/getusername', methods=['POST'])
 @wrapper
 def getusername():
-    return session['user']['t_name']
+    return session['user']['t_id']
 
 
 @app.route('/index', methods=['GET'])
@@ -77,26 +89,26 @@ def teacherScore():
 @wrapper
 def getTeacherinfo():
     s = mysql.Sql()
-    r = s.search("SELECT count FROM TEACHER WHERE t_id=%s" %
+    r = s.search("SELECT count FROM TEACHER WHERE t_id='%s'" %
                  session['user']['t_id'])
     if(r[0]['count'] == 0):
-        return jsonify([{'t_name': "已评分"}])
+        return jsonify([{'t_name': "已评分或无权限"}])
 
     # -----------------------------------------------------------------------申静-------------------------------------------------------
-    sj_ids = [1944,1963]
+    sj_ids = [1944, 1963]
     sjid = 1034
     if(session['user']['t_id'] in sj_ids):
         r = s.search('''
-            SELECT t_name,t_id FROM TEACHER WHERE t_id=%s
+            SELECT t_name,t_id,order1 FROM TEACHER WHERE t_id='%s'
         ''' % sjid)
 
     elif(session['user']['kind'] == 1):
         r = s.search('''
-            SELECT t_name,t_id FROM TEACHER WHERE (kind=2 or kind=3) and bumen_id=%s
+            SELECT t_name,t_id,order1 FROM TEACHER WHERE (kind=2 or kind=3) and bumen_id=%s
         ''' % session['user']['bumen_id'])
     else:
         r = s.search('''
-            SELECT t_name,t_id FROM TEACHER WHERE (kind=2 or kind=3)
+            SELECT t_name,t_id,order1 FROM TEACHER WHERE (kind=2 or kind=3)
         ''')
 
     return jsonify(r)
@@ -115,6 +127,9 @@ def addTeacher():
         d = excel.get_teachers(f.filename)
 
         s = mysql.Sql()
+        # 保存admin pwd
+        r = s.search("SELECT * FROM TEACHER WHERE kind=0")
+
         # 清空表
         s.sqlstr("truncate table t_geifen")
         s.sqlstr("truncate table t_defen")
@@ -124,12 +139,22 @@ def addTeacher():
         s.sqlstr("truncate table teacher")
         s.sqlstr("SET FOREIGN_KEY_CHECKS=1")
 
+        # 存入admin
+        for i in r:
+            s.sqlstr(
+                """
+                INSERT INTO TEACHER(t_id, t_name, t_password, bumen_id, zu_id, kind, count, count_bu) 
+                VALUES("%s", "%s", "%s", %s, %s, %s, %s, %s)
+                """ % (
+                    i['t_id'], i['t_name'], i['t_password'], i['bumen_id'], i['zu_id'], i['kind'], i['count'], i['count_bu']
+                ))
+
         for i in d:
             sql_str = '''
                 INSERT INTO TEACHER(
-                    t_id,t_name,t_password, bumen_id, zu_id, kind,count,count_bu
+                    t_id,t_name,t_password, bumen_id, zu_id, kind,count,count_bu,order1
                     )
-                VALUES ("%s","%s", "%s", %s, %s ,%s,%s,%s)
+                VALUES ("%s","%s", "%s", %s, %s ,%s,%s,%s,%s)
             ''' % (
                 i,
                 d[i][0],
@@ -138,14 +163,15 @@ def addTeacher():
                 d[i][3],
                 d[i][4],
                 d[i][5],
-                d[i][6]
+                d[i][6],
+                d[i][7]
             )
             sql_str = sql_str.replace("None", "NULL")
             s.sqlstr(sql_str)
     except:
         print(traceback.format_exc())
         return traceback.format_exc()
-    return "success"
+    return "提交完成"
 
 
 @app.route('/getTeacherAllinfo', methods=['GET', 'POST'])
@@ -184,7 +210,7 @@ def getTeacherDefen():
     s = mysql.Sql()
     r = s.search(
         '''
-        SELECT * FROM t_defen
+        SELECT t_name,part1_score,part2_score,part3_score,score FROM teacher,t_defen WHERE t_defen.t_id = teacher.t_id
         '''
     )
     return jsonify(r)
@@ -237,10 +263,10 @@ def postTeacherScore():
         s.sqlstr(sql_str)
 
     # 更改次数标志
-    s.sqlstr("UPDATE TEACHER SET count = 0 WHERE t_id=%s" %
+    s.sqlstr("UPDATE TEACHER SET count = 0 WHERE t_id='%s'" %
              session['user']['t_id'])
 
-    return "success"
+    return "提交完成"
 
 
 @app.route('/checkTeacherCount', methods=['POST'])
@@ -267,7 +293,7 @@ def collectTeacherScore():
     for i in t_ids:
         t_id = i['t_id']
         r = s.search('''
-            SELECT * FROM t_geifen WHERE t_idto=%s
+            SELECT * FROM t_geifen WHERE t_idto='%s'
         ''' % (t_id)
         )  # r is list
         d[t_id] = r
@@ -285,7 +311,7 @@ def collectTeacherScore():
         for u in d[i]:
             # 查询类型
             r = s.search('''
-                SELECT kind FROM TEACHER WHERE t_id=%s
+                SELECT kind FROM TEACHER WHERE t_id='%s'
             ''' % (u['t_idfrom'])
             )
             # 类型（1普通2副处3正处4校级） 30 40 30
@@ -305,11 +331,11 @@ def collectTeacherScore():
                 zong = u['t_num1']+u['t_num2'] + \
                     u['t_num3']+u['t_num4']+u['t_num5']
                 r_from = s.search('''
-                    SELECT zu_id FROM TEACHER WHERE t_id=%s
+                    SELECT zu_id FROM TEACHER WHERE t_id='%s'
                 ''' % (u['t_idfrom'])
                 )
                 r_to = s.search('''
-                    SELECT zu_id FROM TEACHER WHERE t_id=%s
+                    SELECT zu_id FROM TEACHER WHERE t_id='%s'
                 ''' % (u['t_idto'])
                 )
                 if(r_from == r_to):
@@ -350,7 +376,7 @@ def collectTeacherScore():
             part3_score,
             score
         ))
-    return "success"
+    return "提交完成"
 
 # --------------------------------------------BUMEN-----------------------------------------------------------------------------------
 @app.route('/bumenScore', methods=['GET'])
@@ -363,10 +389,10 @@ def BumenScore():
 @wrapper
 def getBumeninfo():
     s = mysql.Sql()
-    r = s.search("SELECT count_bu FROM TEACHER WHERE t_id=%s" %
+    r = s.search("SELECT count_bu FROM TEACHER WHERE t_id='%s'" %
                  session['user']['t_id'])
     if(r[0]['count_bu'] == 0):
-        return jsonify([{'bumen_name': "已评分"}])
+        return jsonify([{'bumen_name': "已评分或无权限"}])
 
     r = s.search('''
         SELECT * FROM bumen
@@ -393,19 +419,20 @@ def addBumen():
         for i in d:
             sql_str = '''
                 INSERT INTO BUMEN(
-                    bumen_id,t_id,bumen_name)
-                VALUES (%s,"%s","%s")
+                    bumen_id,t_id,bumen_name,order1)
+                VALUES (%s,"%s","%s",%s)
             ''' % (
                 i,
                 d[i][0],
-                d[i][1]
+                d[i][1],
+                d[i][2]
             )
             sql_str = sql_str.replace("None", "NULL")
             s.sqlstr(sql_str)
     except:
         print(traceback.format_exc())
         return traceback.format_exc()
-    return "success"
+    return "提交完成"
 
 
 @app.route('/getBumenAllinfo', methods=['GET', 'POST'])
@@ -444,7 +471,7 @@ def getBumenDefen():
     s = mysql.Sql()
     r = s.search(
         '''
-        SELECT * FROM bu_defen
+        SELECT bumen_name,part1_score,part2_score,score FROM bumen,bu_defen WHERE bumen.bumen_id=bu_defen.bumen_id
         '''
     )
     return jsonify(r)
@@ -456,13 +483,13 @@ def postBumenScore():
     # bumen_id t_id num1 num2 num3 num4
     j = request.form['json']
     d = json.loads(j)
-    #d_num = {'A': 9, 'B': 8, 'C': 7, 'D': 5, }
+    # d_num = {'A': 9, 'B': 8, 'C': 7, 'D': 5, }
     d2 = dict()
     for i in d:
         if(i[1:] not in d2):
             d2[i[1:]] = dict()
-        if(d[i]==''):
-             return "提交出错！请检查是否有空项"
+        if(d[i] == ''):
+            return "提交出错！请检查是否有空项"
         d2[i[1:]][i[0]] = float(d[i])
 
     s = mysql.Sql()
@@ -495,10 +522,10 @@ def postBumenScore():
         )
         s.sqlstr(sql_str)
     # 更改次数标志
-    s.sqlstr("UPDATE TEACHER SET count_bu = 0 WHERE t_id=%s" %
+    s.sqlstr("UPDATE TEACHER SET count_bu = 0 WHERE t_id='%s'" %
              session['user']['t_id'])
 
-    return "success"
+    return "提交完成"
 
 
 @app.route('/checkBumenCount', methods=['POST'])
@@ -542,7 +569,7 @@ def collectBumenScore():
         for u in d[i]:
             # 查询类型
             r = s.search('''
-                SELECT bumen_id,kind FROM TEACHER WHERE t_id=%s
+                SELECT bumen_id,kind FROM TEACHER WHERE t_id='%s'
             ''' % (u['t_id'])
             )
             # 类型（1普通2副处3正处4校级）
@@ -573,7 +600,7 @@ def collectBumenScore():
         # 部门权重
         part1_score = zhengchu_avg*0.6
         # 直属0.1 非直属0.3
-        #part2_score = xiaojizhixi_avg*0.1+xiaoji_avg*0.3
+        # part2_score = xiaojizhixi_avg*0.1+xiaoji_avg*0.3
         part2_score = (xiaojizhixi_avg+xiaoji_avg)*0.4
         score = part1_score+part2_score
         s.sqlstr('''
@@ -588,7 +615,7 @@ def collectBumenScore():
             score
         ))
 
-    return "success"
+    return "提交完成"
 
 
 @app.route('/outputTeacher', methods=['GET'])
@@ -597,16 +624,17 @@ def outputTeacher():
     s = mysql.Sql()
     r = s.search("SELECT * FROM TEACHER")
     src = excel.output_excel(r, 'teacher')
-    return send_from_directory('output',src,as_attachment=True)
+    return send_from_directory('output', src, as_attachment=True)
 
 
 @app.route('/outputTeacherDefen', methods=['GET'])
 @wrapper
 def outputTeacherDefen():
     s = mysql.Sql()
-    r = s.search("SELECT * FROM t_defen")
+    r = s.search(
+        "SELECT t_name,part1_score,part2_score,part3_score,score FROM teacher,t_defen WHERE t_defen.t_id=teacher.t_id")
     src = excel.output_excel(r, 'TeacherDefen')
-    return send_from_directory('output',src,as_attachment=True)
+    return send_from_directory('output', src, as_attachment=True)
 
 
 @app.route('/outputTeacherGeifen', methods=['GET'])
@@ -615,7 +643,7 @@ def outputTeacherGeifen():
     s = mysql.Sql()
     r = s.search("SELECT * FROM t_geifen")
     src = excel.output_excel(r, 'TeacherGeifen')
-    return send_from_directory('output',src,as_attachment=True)
+    return send_from_directory('output', src, as_attachment=True)
 
 
 @app.route('/outputBumen', methods=['GET'])
@@ -624,16 +652,17 @@ def outputBumen():
     s = mysql.Sql()
     r = s.search("SELECT * FROM bumen")
     src = excel.output_excel(r, 'Bumen')
-    return send_from_directory('output',src,as_attachment=True)
+    return send_from_directory('output', src, as_attachment=True)
 
 
 @app.route('/outputBumenDefen', methods=['GET'])
 @wrapper
 def outputBumenDefen():
     s = mysql.Sql()
-    r = s.search("SELECT * FROM bu_defen")
+    r = s.search(
+        "SELECT bumen_name,part1_score,part2_score,score FROM bumen,bu_defen WHERE bumen.bumen_id=bu_defen.bumen_id")
     src = excel.output_excel(r, 'BumenDefen')
-    return send_from_directory('output',src,as_attachment=True)
+    return send_from_directory('output', src, as_attachment=True)
 
 
 @app.route('/outputBumenGeifen', methods=['GET'])
@@ -642,18 +671,18 @@ def outputBumenGeifen():
     s = mysql.Sql()
     r = s.search("SELECT * FROM bu_geifen")
     src = excel.output_excel(r, 'BumenGeifen')
-    return send_from_directory('output',src,as_attachment=True)
+    return send_from_directory('output', src, as_attachment=True)
 
 
 @app.route('/clearTeacherGeifen', methods=['POST', 'GET'])
 @wrapper
 def clearTeacherGeifen():
     s = mysql.Sql()
-    s.sqlstr("DELETE FROM t_geifen where t_idfrom=%s" %
+    s.sqlstr("DELETE FROM t_geifen where t_idfrom='%s'" %
              session['user']['t_id'])
-    s.sqlstr("UPDATE teacher SET count = 1 where t_id=%s" %
+    s.sqlstr("UPDATE teacher SET count = 1 where t_id='%s'" %
              session['user']['t_id'])
-    return "success"
+    return "提交完成"
 
 
 @app.route('/clearBumenGeifen', methods=['POST', "GET"])
@@ -662,11 +691,11 @@ def clearBumenGeifen():
     if(session['user']['kind'] != 3 and session['user']['kind'] != 4):
         return "无权限"
     s = mysql.Sql()
-    s.sqlstr("DELETE FROM bu_geifen where t_id=%s" %
+    s.sqlstr("DELETE FROM bu_geifen where t_id='%s'" %
              session['user']['t_id'])
-    s.sqlstr("UPDATE teacher SET count_bu = 1 where t_id=%s" %
+    s.sqlstr("UPDATE teacher SET count_bu = 1 where t_id='%s'" %
              session['user']['t_id'])
-    return "success"
+    return "提交完成"
 
 
 if __name__ == '__main__':

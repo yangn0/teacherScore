@@ -1,0 +1,31 @@
+{% extends "addTeacher.html" %}
+
+{% block  body_block %}
+<div class="Hui-article">
+	<input type="password" id="pwd" />
+	<input type="button" value="更改" id="button" />
+</div>
+
+<script>
+	$("#button").click(function () {
+		$.ajax(
+			{
+				url: "/changePwd",
+				type: "POST",
+				data: {
+					'pwd':$("#pwd").val()
+				},
+				async: true,
+				success: function (returndata) {
+					alert(returndata);
+				},
+				error: function (returndata) {
+
+					alert("失败！")
+
+				}
+			})
+	}
+	);
+</script>
+{% endblock %}
