@@ -93,24 +93,26 @@ def getTeacherinfo():
                  session['user']['t_id'])
     if(r[0]['count'] == 0):
         return jsonify([{'t_name': "已评分或无权限"}])
-
     # -----------------------------------------------------------------------申静-------------------------------------------------------
     sj_ids = [1944, 1963]
     sjid = 1034
     if(session['user']['t_id'] in sj_ids):
         r = s.search('''
-            SELECT t_name,t_id,order1 FROM TEACHER WHERE t_id='%s'
+            SELECT t_name,t_id,order1,zu_id FROM TEACHER WHERE t_id='%s'
         ''' % sjid)
 
     elif(session['user']['kind'] == 1):
         r = s.search('''
-            SELECT t_name,t_id,order1 FROM TEACHER WHERE (kind=2 or kind=3) and bumen_id=%s
+            SELECT t_name,t_id,order1,zu_id FROM TEACHER WHERE (kind=2 or kind=3) and bumen_id=%s
         ''' % session['user']['bumen_id'])
     else:
         r = s.search('''
-            SELECT t_name,t_id,order1 FROM TEACHER WHERE (kind=2 or kind=3)
+            SELECT t_name,t_id,order1,zu_id FROM TEACHER WHERE (kind=2 or kind=3)
         ''')
-
+    for i in r:
+        if(i['zu_id']==session['user']['zu_id']):
+            i['order1']=0
+            
     return jsonify(r)
 
 

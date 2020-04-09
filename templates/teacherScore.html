@@ -81,10 +81,14 @@
 				var names = new Array();
 				for (var i = 0, len = data.length; i < len; i++) {
 					// names[i] = data[i]['t_name'];
+					var style=""
+					if(data[i]['order1']==0){
+						style="style='font-weight:bold;'"
+					}
 					$("#tab").append("\
 							<tr class='text-c'>\
 							<td>" + data[i]['order1'] + "</td>\
-							<td>" + data[i]['t_name'] + "</td>\
+							<td "+style+">" + data[i]['t_name'] + "</td>\
 							<td>\
 								<input type='radio' name=1" + data[i]['t_id'] + " value='A'>A</input>\
 								<input type='radio' name=1" + data[i]['t_id'] + " value='B'>B</input>\
