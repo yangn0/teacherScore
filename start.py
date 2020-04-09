@@ -110,8 +110,8 @@ def getTeacherinfo():
             SELECT t_name,t_id,order1,zu_id FROM TEACHER WHERE (kind=2 or kind=3)
         ''')
     for i in r:
-        if(i['zu_id']==session['user']['zu_id']):
-            i['order1']=0
+        if(i['zu_id']==session['user']['zu_id'] and session['user']['kind']==4):
+            i['order1']-=200
             
     return jsonify(r)
 

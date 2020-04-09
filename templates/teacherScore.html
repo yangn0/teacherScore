@@ -82,7 +82,7 @@
 				for (var i = 0, len = data.length; i < len; i++) {
 					// names[i] = data[i]['t_name'];
 					var style=""
-					if(data[i]['order1']==0){
+					if(data[i]['order1']<0){
 						style="style='font-weight:bold;'"
 					}
 					$("#tab").append("\
