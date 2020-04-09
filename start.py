@@ -7,7 +7,7 @@ import mysql
 import time
 import os
 import excel
-from werkzeug import secure_filename
+from werkzeug.utils import secure_filename
 import traceback
 
 app = Flask(__name__)
