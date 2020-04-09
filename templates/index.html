@@ -31,6 +31,17 @@
 	<script type="text/javascript" src="static/h-ui.admin/js/H-ui.admin.page.js"></script>
 	<!--/meta 作为公共模版分离出去-->
 
+	<style>
+		.table-bg thead th {
+			background-color: 	#C0C0C0 !important;
+			text-align: left!important;
+			
+		}
+
+		.sorting{
+			text-align: left!important;
+		}
+	</style>
 
 	{% block  title_block %}
 	<title>河北建筑工程学院处级干部及部门考核评分系统</title>
@@ -43,10 +54,10 @@
 	<!--_header 作为公共模版分离出去-->
 	<header class="navbar-wrapper">
 		<div class="navbar navbar-fixed-top">
-			<div class="container-fluid cl"> <a class="logo navbar-logo f-l mr-10 hidden-xs"
-					href="/aboutHui.shtml">河北建筑工程学院处级干部及部门考核评分系统</a>
+			<div class="container-fluid cl"> <span class="logo navbar-logo f-l mr-10 hidden-xs"
+					>河北建筑工程学院处级干部及部门考核评分系统</span>
+
 				
-				<a aria-hidden="false" class="nav-toggle Hui-iconfont visible-xs" href="javascript:;">&#xe667;</a>
 				<nav id="Hui-userbar" class="nav navbar-nav navbar-userbar hidden-xs">
 					<ul class="cl">
 						<!-- <li>超级管理员</li> -->
@@ -113,6 +124,7 @@
 
 		</div>
 	</aside>
+
 	<div class="dislpayArrow hidden-xs"><a class="pngfix" href="javascript:void(0);" onClick="displaynavbar(this)"></a>
 	</div>
 
