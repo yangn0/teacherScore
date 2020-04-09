@@ -46,7 +46,7 @@
 							value="&nbsp;登&nbsp;&nbsp;&nbsp;&nbsp;录&nbsp;">
 					</div>
 				</div>
-				
+
 			</form>
 		</div>
 	</div>
@@ -59,33 +59,34 @@
 		$("#login").click(function () {
 			var t_id;
 			var password;
-			t_id=$("#t_id").val();
-			password=$("#password").val();
+			t_id = $("#t_id").val();
+			password = $("#password").val();
 			$.ajax(
-			{
-				url: "/login",
-				type: "POST",
-				data: {
-					't_id':t_id,
-					'password':password
-				},
-				async: true,
-				
-				success: function (returndata) {
-					if(returndata!="工号或密码错误"){
-						if(t_id=="admin"){
-							window.location.replace("/addTeacher");
+				{
+					url: "/login",
+					type: "POST",
+					data: {
+						't_id': t_id,
+						'password': password
+					},
+					async: true,
+
+					success: function (returndata) {
+						if (returndata != "工号或密码错误") {
+							if (t_id == "admin") {
+								window.location.replace("/addTeacher");
+							}
+							else window.location.replace("/index");
 						}
-						else window.location.replace("/index");
+						else alert(returndata);
+					},
+					error: function (returndata) {
+
+						alert("error");
+
 					}
-					else alert(returndata);
-				},
-				error: function (returndata) {
-
-					alert("error");
-
-				}
-			})});
+				})
+		});
 	</script>
 
 </body>
