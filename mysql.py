@@ -15,7 +15,7 @@ create table Teacher(
     )
 """
 
-Teacher_admin = """INSERT INTO TEACHER(t_id,t_name,t_password, bumen_id, zu_id, kind,count,count_bu) VALUES ("%s","%s", "%s", %s, %s ,%s,%s,%s)
+Teacher_admin = """INSERT INTO Teacher(t_id,t_name,t_password, bumen_id, zu_id, kind,count,count_bu) VALUES ("%s","%s", "%s", %s, %s ,%s,%s,%s)
 """ % (
     'admin', 'admin', '123456', 0, 0, 0, 0, 0
 )

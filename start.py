@@ -340,22 +340,35 @@ def collectTeacherScore():
                     SELECT zu_id FROM TEACHER WHERE t_id='%s'
                 ''' % (u['t_idto'])
                 )
-                if(r_from == r_to):
+                if(r_from[0]['zu_id'] == r_to[0]['zu_id']):
                     # 同组
                     xiaoji_zhixi.append(zong)
                 else:
                     xiaoji.append(zong)
 
-        try:
+        
             putong_avg = 0
             zhengchu_avg = 0
             fuchu_avg = 0
             xiaoji_avg = 0
             xiaojizhixi_avg = 0
+        try:
             putong_avg = sum(putong)/len(putong)
+        except:
+            pass
+        try:
             zhengchu_avg = sum(zhengchu)/len(zhengchu)
+        except:
+            pass
+        try:
             fuchu_avg = sum(fuchu)/len(fuchu)
+        except:
+            pass
+        try:
             xiaoji_avg = sum(xiaoji)/len(xiaoji)
+        except:
+            pass
+        try:
             xiaojizhixi_avg = sum(xiaoji_zhixi)/len(xiaoji_zhixi)
         except:
             pass
@@ -384,7 +397,7 @@ def collectTeacherScore():
 @app.route('/bumenScore', methods=['GET'])
 @wrapper
 def BumenScore():
-    return render_template('BumenScore.html')
+    return render_template('bumenScore.html')
 
 
 @app.route('/getBumeninfo', methods=['POST'])
@@ -589,12 +602,19 @@ def collectBumenScore():
                     xiaoji_zhixi.append(zong)
                 else:
                     xiaoji.append(zong)
-        try:
+        
             zhengchu_avg = 0
             xiaoji_avg = 0
             xiaojizhixi_avg = 0
+        try:
             zhengchu_avg = sum(zhengchu)/len(zhengchu)
+        except:
+            pass
+        try:
             xiaoji_avg = sum(xiaoji)/len(xiaoji)
+        except:
+            pass
+        try:
             xiaojizhixi_avg = sum(xiaoji_zhixi)/len(xiaoji_zhixi)
         except:
             pass
