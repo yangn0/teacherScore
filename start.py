@@ -11,7 +11,7 @@ from werkzeug.utils import secure_filename
 import traceback
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = os.urandom(24)  # 设置一个随机24位字符串为加密盐
+app.config['SECRET_KEY'] =  "yangning" # os.urandom(24)设置一个随机24位字符串为加密盐
 app.config.update(TEMPLATE_AUTO_RELOAD=True)
 
 # 装饰器装饰多个视图函数
