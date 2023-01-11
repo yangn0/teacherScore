@@ -14,22 +14,15 @@ create table Teacher(
     order1 int
     )
 """
-
+#加入管理员用户 匿名用户
 Teacher_admin = """INSERT INTO Teacher(t_id,t_name,t_password, bumen_id, zu_id, kind,count,count_bu) VALUES ("%s","%s", "%s", %s, %s ,%s,%s,%s)
 """ % (
     'admin', 'admin', '123456', 0, 0, 0, 0, 0
 )
-
-
-# 创建部门表
-Bumen = """
-create table Bumen(
-    bumen_id int not null,
-    t_id varchar(100) not null,
-    bumen_name varchar(100) not null,
-    order1 int
+Teacher_no = """INSERT INTO Teacher(t_id,t_name,t_password, bumen_id, zu_id, kind,count,count_bu) VALUES ("%s","%s", "%s", %s, %s ,%s,%s,%s)
+""" % (
+    'anonymous', 'anonymous', '123456', 0, 0, 5, 0, 0
 )
-"""
 
 
 # t_给分表
@@ -41,7 +34,12 @@ create table t_geifen(
     t_num2 int not null,
     t_num3 int not null,
     t_num4 int not null,
-    t_num5 int not null
+    t_num5 int not null,
+    t_num6 int not null,
+    t_num7 int not null,
+    t_num8 int not null,
+    t_num9 int not null,
+    t_num10 int not null
 )
 '''
 
@@ -49,9 +47,6 @@ create table t_geifen(
 t_defen = '''
 create table t_defen(
     t_id varchar(100) not null PRIMARY KEY,
-    part1_score float not null,
-    part2_score float not null,
-    part3_score float not null,
     score float not null,
     foreign key(t_id) references Teacher(t_id) on delete cascade on update cascade
 );
@@ -61,23 +56,27 @@ create table t_defen(
 # bu_给分表
 bu_geifen = '''
 create table bu_geifen(
-    bumen_id int not null,
-    t_id varchar(100) not null,
-    num1 float not null,
-    num2 float not null,
-    num3 float not null,
-    num4 float not null,
-    foreign key(t_id) references Teacher(t_id) on delete cascade on update cascade
+    t_idfrom varchar(100) not null,
+    t_idto varchar(100) not null,
+    t_num1 int not null,
+    t_num2 int not null,
+    t_num3 int not null,
+    t_num4 int not null,
+    t_num5 int not null,
+    t_num6 int not null,
+    t_num7 int not null,
+    t_num8 int not null,
+    t_num9 int not null,
+    t_num10 int not null
     )
 '''
 
 # bu_得分表
 bu_defen = '''
 create table bu_defen(
-    bumen_id int not null,
-    part1_score float not null,
-    part2_score float not null,
-    score float not null
+    t_id varchar(100) not null PRIMARY KEY,
+    score float not null,
+    foreign key(t_id) references Teacher(t_id) on delete cascade on update cascade
     )
 '''
 
@@ -122,7 +121,6 @@ class Sql:
         try:
             # 执行sql语句
             self.cursor.execute(Teacher)
-            self.cursor.execute(Bumen)
             self.cursor.execute(t_geifen)
             self.cursor.execute(t_defen)
             self.cursor.execute(bu_geifen)
@@ -162,7 +160,7 @@ if __name__ == "__main__":
         # 执行sql语句
         s.cursor.execute(Teacher)
         s.cursor.execute(Teacher_admin)
-        s.cursor.execute(Bumen)
+        s.cursor.execute(Teacher_no)
         s.cursor.execute(t_geifen)
         s.cursor.execute(t_defen)
         s.cursor.execute(bu_geifen)

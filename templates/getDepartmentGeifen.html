@@ -29,14 +29,14 @@
 			</table>
 		</div>
 	</article>
-	<a href="/outputTeacherGeifen" ><input class="btn btn-primary radius"  type="submit" value="导出表"></a>
+	<a href="/outputDepartmentGeifen" ><input class="btn btn-primary radius"  type="submit" value="导出表"></a>
 </div>
 
 <script>
 	$.ajax({
 		async: false,
 		type: 'POST',
-		url: '/getTeacherGeifen',
+		url: '/getDepartmentGeifen',
 		data: {
 		},
 		dataType: 'json',
