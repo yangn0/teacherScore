@@ -229,25 +229,24 @@ def postTeacherScore():
     #校验
     temp_dict=dict()
     for i in d:
+        temp_dict[i]=0
         for num,u in enumerate(d[i]):
             if u=="---请选择---":
                 return "提交出错！请检查是否有空项"
-            if num not in temp_dict:
-                temp_dict[num]=list()
-            temp_dict[num].append(int(u))
+            temp_dict[i]+=int(u)  #给每个人的总分
+
     #10%的低于 80，10%高于 90
+    n=0 #低于80的计数
+    n1=0 #高于90的计数
     for i in temp_dict:
-        n=0 #低于80的计数
-        n1=0 #高于90的计数
-        for u in temp_dict[i]:
-            if u<80:
-                n+=1
-            if u>90:
-                n1+=1
-        if(n>len(temp_dict[i])*0.1 and n1<=len(temp_dict[i])*0.1):
-            pass
-        else:
-            return "提交出错！不符合每个维度中 至少10%的低于80，最多10%高于90"
+        if temp_dict[i]<800:
+            n+=1
+        if temp_dict[i]>900:
+            n1+=1
+    if(n>len(temp_dict)*0.1 and n1<=len(temp_dict)*0.1):
+        pass
+    else:
+        return "提交出错！不符合 至少10%的低于80，最多10%高于90"
     for i in d:#############################################################################################
         sql_str = '''
             INSERT INTO t_geifen(
