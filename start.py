@@ -42,7 +42,7 @@ def login():
     password = request.form['password']
     s = mysql.Sql()
     r = s.search('''
-        SELECT * FROM TEACHER WHERE t_id='%s' and t_password='%s'
+        SELECT * FROM teacher WHERE t_id='%s' and t_password='%s'
     ''' % (t_id, password))
     if(len(r) == 0):
         return "工号或密码错误"
@@ -61,7 +61,7 @@ def changePwd():
     pwd = request.form['pwd']
     s = mysql.Sql()
     r = s.sqlstr('''
-        UPDATE TEACHER SET t_password = %s where t_id='%s'
+        UPDATE teacher SET t_password = %s where t_id='%s'
     ''' % (pwd, session['user']['t_id']))
     return '提交完成'
 
@@ -89,7 +89,7 @@ def teacherScore():
 @wrapper
 def getTeacherinfo():
     s = mysql.Sql()
-    r = s.search("SELECT count FROM TEACHER WHERE t_id='%s'" %
+    r = s.search("SELECT count FROM teacher WHERE t_id='%s'" %
                  session['user']['t_id'])
     if(r[0]['count'] == 0):
         return jsonify([{'t_name': "已评分或无权限"}])
@@ -98,16 +98,16 @@ def getTeacherinfo():
     sjid = 1034
     if(session['user']['t_id'] in sj_ids):
         r = s.search('''
-            SELECT t_name,t_id,order1,zu_id FROM TEACHER WHERE t_id='%s'
+            SELECT t_name,t_id,order1,zu_id FROM teacher WHERE t_id='%s'
         ''' % sjid)
 
     elif(session['user']['kind'] == 1):
         r = s.search('''
-            SELECT t_name,t_id,order1,zu_id FROM TEACHER WHERE (kind=2 or kind=3) and bumen_id=%s
+            SELECT t_name,t_id,order1,zu_id FROM teacher WHERE (kind=2 or kind=3) and bumen_id=%s
         ''' % session['user']['bumen_id'])
     else:
         r = s.search('''
-            SELECT t_name,t_id,order1,zu_id FROM TEACHER WHERE (kind=2 or kind=3)
+            SELECT t_name,t_id,order1,zu_id FROM teacher WHERE (kind=2 or kind=3)
         ''')
     for i in r:
         if(i['zu_id']==session['user']['zu_id'] and session['user']['kind']==4):
@@ -130,7 +130,7 @@ def addTeacher():
 
         s = mysql.Sql()
         # 保存admin pwd
-        r = s.search("SELECT * FROM TEACHER WHERE kind=0")
+        r = s.search("SELECT * FROM teacher WHERE kind=0")
 
         # 清空表
         s.sqlstr("truncate table t_geifen")
@@ -145,7 +145,7 @@ def addTeacher():
         for i in r:
             s.sqlstr(
                 """
-                INSERT INTO TEACHER(t_id, t_name, t_password, bumen_id, zu_id, kind, count, count_bu) 
+                INSERT INTO teacher(t_id, t_name, t_password, bumen_id, zu_id, kind, count, count_bu) 
                 VALUES("%s", "%s", "%s", %s, %s, %s, %s, %s)
                 """ % (
                     i['t_id'], i['t_name'], i['t_password'], i['bumen_id'], i['zu_id'], i['kind'], i['count'], i['count_bu']
@@ -153,7 +153,7 @@ def addTeacher():
 
         for i in d:
             sql_str = '''
-                INSERT INTO TEACHER(
+                INSERT INTO teacher(
                     t_id,t_name,t_password, bumen_id, zu_id, kind,count,count_bu,order1
                     )
                 VALUES ("%s","%s", "%s", %s, %s ,%s,%s,%s,%s)
@@ -184,7 +184,7 @@ def getTeacherAllinfo():
     s = mysql.Sql()
     r = s.search(
         '''
-        SELECT * FROM TEACHER
+        SELECT * FROM teacher
         '''
     )
     return jsonify(r)
@@ -236,11 +236,11 @@ def postTeacherScore():
 
     # 查询总人数
     if(session['user']['kind'] == 1):
-        count_t = s.search("SELECT COUNT(*) FROM TEACHER WHERE (kind=2 or kind=3) and bumen_id=%s"
+        count_t = s.search("SELECT COUNT(*) FROM teacher WHERE (kind=2 or kind=3) and bumen_id=%s"
                            % session['user']['bumen_id'])[0]['COUNT(*)']
     else:
         count_t = s.search(
-            "SELECT COUNT(*) FROM TEACHER WHERE kind=2 or kind=3")[0]['COUNT(*)']
+            "SELECT COUNT(*) FROM teacher WHERE kind=2 or kind=3")[0]['COUNT(*)']
 
     if len(d2) != int(count_t):
         return "提交出错！请检查是否有空项"
@@ -265,7 +265,7 @@ def postTeacherScore():
         s.sqlstr(sql_str)
 
     # 更改次数标志
-    s.sqlstr("UPDATE TEACHER SET count = 0 WHERE t_id='%s'" %
+    s.sqlstr("UPDATE teacher SET count = 0 WHERE t_id='%s'" %
              session['user']['t_id'])
 
     return "提交完成"
@@ -275,7 +275,7 @@ def postTeacherScore():
 @wrapper
 def checkTeacherCount():
     s = mysql.Sql()
-    counts = s.search("SELECT t_id,count FROM TEACHER")
+    counts = s.search("SELECT t_id,count FROM teacher")
     l = list()
     for i in counts:
         if(i['count'] == 1):
@@ -289,7 +289,7 @@ def collectTeacherScore():
     # t_id part1_score part2_score part3_score score
     s = mysql.Sql()
     t_ids = s.search('''
-        SELECT t_id FROM TEACHER
+        SELECT t_id FROM teacher
     ''')
     d = dict()
     for i in t_ids:
@@ -313,7 +313,7 @@ def collectTeacherScore():
         for u in d[i]:
             # 查询类型
             r = s.search('''
-                SELECT kind FROM TEACHER WHERE t_id='%s'
+                SELECT kind FROM teacher WHERE t_id='%s'
             ''' % (u['t_idfrom'])
             )
             # 类型（1普通2副处3正处4校级） 30 40 30
@@ -333,11 +333,11 @@ def collectTeacherScore():
                 zong = u['t_num1']+u['t_num2'] + \
                     u['t_num3']+u['t_num4']+u['t_num5']
                 r_from = s.search('''
-                    SELECT zu_id FROM TEACHER WHERE t_id='%s'
+                    SELECT zu_id FROM teacher WHERE t_id='%s'
                 ''' % (u['t_idfrom'])
                 )
                 r_to = s.search('''
-                    SELECT zu_id FROM TEACHER WHERE t_id='%s'
+                    SELECT zu_id FROM teacher WHERE t_id='%s'
                 ''' % (u['t_idto'])
                 )
                 if(r_from[0]['zu_id'] == r_to[0]['zu_id']):
@@ -404,7 +404,7 @@ def BumenScore():
 @wrapper
 def getBumeninfo():
     s = mysql.Sql()
-    r = s.search("SELECT count_bu FROM TEACHER WHERE t_id='%s'" %
+    r = s.search("SELECT count_bu FROM teacher WHERE t_id='%s'" %
                  session['user']['t_id'])
     if(r[0]['count_bu'] == 0):
         return jsonify([{'bumen_name': "已评分或无权限"}])
@@ -433,7 +433,7 @@ def addBumen():
 
         for i in d:
             sql_str = '''
-                INSERT INTO BUMEN(
+                INSERT INTO bumen(
                     bumen_id,t_id,bumen_name,order1)
                 VALUES (%s,"%s","%s",%s)
             ''' % (
@@ -458,7 +458,7 @@ def getBumenAllinfo():
     s = mysql.Sql()
     r = s.search(
         '''
-        SELECT * FROM BUMEN
+        SELECT * FROM bumen
         '''
     )
     return jsonify(r)
@@ -509,7 +509,7 @@ def postBumenScore():
 
     s = mysql.Sql()
     # 查询正处级校级总人数
-    # count_t = s.search("SELECT COUNT(*) FROM TEACHER WHERE kind=3 or kind=4 and bumen_id=%s"
+    # count_t = s.search("SELECT COUNT(*) FROM teacher WHERE kind=3 or kind=4 and bumen_id=%s"
     #                    % session['user']['bumen_id'])[0]['COUNT(*)']
 
     # 部门数
@@ -537,7 +537,7 @@ def postBumenScore():
         )
         s.sqlstr(sql_str)
     # 更改次数标志
-    s.sqlstr("UPDATE TEACHER SET count_bu = 0 WHERE t_id='%s'" %
+    s.sqlstr("UPDATE teacher SET count_bu = 0 WHERE t_id='%s'" %
              session['user']['t_id'])
 
     return "提交完成"
@@ -547,7 +547,7 @@ def postBumenScore():
 @wrapper
 def checkBumenCount():
     s = mysql.Sql()
-    counts = s.search("SELECT t_id,count_bu FROM TEACHER")
+    counts = s.search("SELECT t_id,count_bu FROM teacher")
     l = list()
     for i in counts:
         if(i['count_bu'] == 1):
@@ -584,7 +584,7 @@ def collectBumenScore():
         for u in d[i]:
             # 查询类型
             r = s.search('''
-                SELECT bumen_id,kind FROM TEACHER WHERE t_id='%s'
+                SELECT bumen_id,kind FROM teacher WHERE t_id='%s'
             ''' % (u['t_id'])
             )
             # 类型（1普通2副处3正处4校级）
@@ -644,7 +644,7 @@ def collectBumenScore():
 @wrapper
 def outputTeacher():
     s = mysql.Sql()
-    r = s.search("SELECT * FROM TEACHER")
+    r = s.search("SELECT * FROM teacher")
     src = excel.output_excel(r, 'teacher')
     return send_from_directory('output', src, as_attachment=True)
 

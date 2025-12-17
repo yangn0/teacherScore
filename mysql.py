@@ -2,7 +2,7 @@ import pymysql
 
 # 创建教师表
 Teacher = """
-create table Teacher(
+create table teacher(
     t_id varchar(100) not null PRIMARY KEY,
     t_name varchar(100) not null,
     t_password varchar(100) not null,
@@ -15,7 +15,7 @@ create table Teacher(
     )
 """
 
-Teacher_admin = """INSERT INTO Teacher(t_id,t_name,t_password, bumen_id, zu_id, kind,count,count_bu) VALUES ("%s","%s", "%s", %s, %s ,%s,%s,%s)
+Teacher_admin = """INSERT INTO teacher(t_id,t_name,t_password, bumen_id, zu_id, kind,count,count_bu) VALUES ("%s","%s", "%s", %s, %s ,%s,%s,%s)
 """ % (
     'admin', 'admin', '123456', 0, 0, 0, 0, 0
 )
@@ -23,7 +23,7 @@ Teacher_admin = """INSERT INTO Teacher(t_id,t_name,t_password, bumen_id, zu_id, 
 
 # 创建部门表
 Bumen = """
-create table Bumen(
+create table bumen(
     bumen_id int not null,
     t_id varchar(100) not null,
     bumen_name varchar(100) not null,
@@ -53,7 +53,7 @@ create table t_defen(
     part2_score float not null,
     part3_score float not null,
     score float not null,
-    foreign key(t_id) references Teacher(t_id) on delete cascade on update cascade
+    foreign key(t_id) references teacher(t_id) on delete cascade on update cascade
 );
 
 '''
@@ -67,7 +67,7 @@ create table bu_geifen(
     num2 float not null,
     num3 float not null,
     num4 float not null,
-    foreign key(t_id) references Teacher(t_id) on delete cascade on update cascade
+    foreign key(t_id) references teacher(t_id) on delete cascade on update cascade
     )
 '''
 
@@ -83,18 +83,30 @@ create table bu_defen(
 
 
 class Sql:
+
     def __init__(self):
-        self.db = pymysql.connect(host='localhost',  # 指定连接本地服务器
-                                  user='root',    # 登录服务器 用的用户名
-                                  password='yangning',  # 登录服务器用的密码
-                                  database='YANGNING',    # 指定目标数据库
-                                  charset='utf8')
-        # 规定返回的值为字典类型，否则默认返回元组类型
-        self.cursor = self.db.cursor(cursor=pymysql.cursors.DictCursor)
+        try:
+            self.db = pymysql.connect(
+                host='localhost',  # 指定连接本地服务器
+                user='root',  # 登录服务器 用的用户名
+                password='123456',  # 登录服务器用的密码
+                database='yangning',  # 指定目标数据库
+                charset='utf8')
+            # 规定返回的值为字典类型，否则默认返回元组类型
+            self.cursor = self.db.cursor(cursor=pymysql.cursors.DictCursor)
+        except Exception as e:
+            self._connected = False
+            self.db = None
+            self.cursor = None
+            print(f"数据库连接失败: {e}")
+            # 可以选择重新抛出异常或进行其他处理
+            raise e  # 或者只是记录错误而不抛出
+
 
     def __del__(self):
-        # 关闭数据库连接
-        self.db.close()
+        # 只有在成功连接的情况下才关闭
+        if hasattr(self, 'db') and self.db:
+            self.db.close()
 
     def sqlstr(self, sql_str):
         try:
@@ -144,7 +156,7 @@ if __name__ == "__main__":
         conn=pymysql.connect(
             host='localhost',
             user='root',
-            passwd='yangning',
+            passwd='123456',
         )
         cur=conn.cursor()
         create_database_sql='CREATE DATABASE IF NOT EXISTS yangning DEFAULT CHARSET utf8 COLLATE utf8_general_ci;'
