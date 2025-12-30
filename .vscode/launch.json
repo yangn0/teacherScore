@@ -10,6 +10,13 @@
             "request": "launch",
             "program": "start.py",
             "console": "integratedTerminal"
+        },
+        {
+            "name": "mock",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "auto_score.py",
+            "console": "integratedTerminal"
         }
     ]
 }
