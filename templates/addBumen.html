@@ -5,7 +5,45 @@
 <div id="main_box">
 	<form id="uploadForm" enctype="multipart/form-data" style="text-align: center;">
 		<div>
-			<input type="file" name="file" accept=".xlsx" value="">
+			<h3>导入处级领导班子数据</h3>
+			<div style="text-align: left; max-width: 800px; margin: 20px auto; padding: 15px; background-color: #f5f5f5; border-radius: 5px;">
+				<h4>CSV文件格式说明：</h4>
+				<p><strong>文件格式：</strong>CSV文件（逗号分隔），UTF-8编码</p>
+				<p><strong>必须包含以下6列（按顺序）：</strong></p>
+				<ol>
+					<li><strong>bumen_id</strong> - 部门ID（必填，数字，唯一标识）</li>
+					<li><strong>t_id</strong> - 部门负责人工号（必填）</li>
+					<li><strong>bumen_name</strong> - 部门名称（必填）</li>
+					<li><strong>order1</strong> - 排序字段（必填，数字）</li>
+					<li><strong>bumen_type</strong> - 部门类型（必填，数字）
+						<ul style="margin-top: 5px;">
+							<li>1 = 教学单位</li>
+							<li>2 = 党政群团机构</li>
+							<li>3 = 教辅单位</li>
+						</ul>
+					</li>
+					<li><strong>mubiao_jixiao_score</strong> - 目标绩效考核得分（必填，数字，范围60-100）</li>
+				</ol>
+				<p style="color: #e74c3c;"><strong>注意事项：</strong></p>
+				<ul>
+					<li>第一行必须是表头，数据从第二行开始</li>
+					<li>部门类型决定了评分权限和权重计算方式</li>
+					<li>目标绩效得分是部门考核的重要组成部分（占60%）</li>
+					<li>导入前会清空现有部门数据、部门评分记录和目标绩效数据</li>
+				</ul>
+				<p><strong>部门类型说明：</strong></p>
+				<ul>
+					<li><strong>教学单位(1)：</strong>如各学院，正处级可评本单位+党政群团+教辅</li>
+					<li><strong>党政群团机构(2)：</strong>如党委办、校办，正处级可评全校所有部门</li>
+					<li><strong>教辅单位(3)：</strong>如教务处、科研处，正处级可评党政群团+教辅</li>
+				</ul>
+				<p><strong>示例CSV内容：</strong></p>
+				<pre style="background: white; padding: 10px; border: 1px solid #ddd;">bumen_id,t_id,bumen_name,order1,bumen_type,mubiao_jixiao_score
+1,1001,党委办公室,1,2,95.5
+9,3001,土木工程学院,9,1,95.2
+6,2001,教务处,6,3,90.3</pre>
+			</div>
+			<input type="file" name="file" accept=".csv" value="">
 			<input type="button" value="上传" id="upFileBtn">
 		</div>
 	</form>

@@ -27,6 +27,7 @@ create table bumen(
     bumen_id int not null,
     t_id varchar(100) not null,
     bumen_name varchar(100) not null,
+    bumen_type int not null DEFAULT 1,
     order1 int
 )
 """
@@ -78,6 +79,24 @@ create table bu_defen(
     part1_score float not null,
     part2_score float not null,
     score float not null
+    )
+'''
+
+# bu_目标绩效表（新增）
+bu_mubiao_jixiao = '''
+create table bu_mubiao_jixiao(
+    bumen_id int not null PRIMARY KEY,
+    mubiao_jixiao_score float not null
+    )
+'''
+
+# 分管关系表（新增）- 存储副处级干部和其分管校领导的关系
+fenguan_guanxi = '''
+create table fenguan_guanxi(
+    fuchu_t_id varchar(100) not null,
+    xiaoji_t_id varchar(100) not null,
+    foreign key(fuchu_t_id) references teacher(t_id) on delete cascade on update cascade,
+    foreign key(xiaoji_t_id) references teacher(t_id) on delete cascade on update cascade
     )
 '''
 
@@ -139,6 +158,8 @@ class Sql:
             self.cursor.execute(t_defen)
             self.cursor.execute(bu_geifen)
             self.cursor.execute(bu_defen)
+            self.cursor.execute(bu_mubiao_jixiao)
+            self.cursor.execute(fenguan_guanxi)
 
             # 提交到数据库执行
             self.db.commit()
@@ -179,6 +200,8 @@ if __name__ == "__main__":
         s.cursor.execute(t_defen)
         s.cursor.execute(bu_geifen)
         s.cursor.execute(bu_defen)
+        s.cursor.execute(bu_mubiao_jixiao)
+        s.cursor.execute(fenguan_guanxi)
 
         # 提交到数据库执行
         s.db.commit()
