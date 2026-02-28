@@ -1,9 +1,9 @@
-FROM python:3.6
+FROM python:3.12
 WORKDIR /teacherScore
 
-COPY requirements.txt ./
-RUN pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
+COPY requirement.txt ./
+RUN pip install --no-cache-dir -r requirement.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
 
 COPY . .
 
-CMD ["gunicorn", "start:app", "-c", "./gunicorn.conf.py"]
+CMD [ "sh", "-c", "python mysql.py && gunicorn start:app -c ./gunicorn.conf.py"]

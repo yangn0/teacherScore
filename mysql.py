@@ -1,4 +1,5 @@
 import pymysql
+import os
 
 # 创建教师表
 Teacher = """
@@ -106,10 +107,10 @@ class Sql:
     def __init__(self):
         try:
             self.db = pymysql.connect(
-                host='localhost',  # 指定连接本地服务器
-                user='root',  # 登录服务器 用的用户名
-                password='123456',  # 登录服务器用的密码
-                database='yangning',  # 指定目标数据库
+                host=os.getenv("DB_HOST", "mysql"),  # 指定连接本地服务器
+                user=os.getenv("DB_USER", "root"),  # 登录服务器 用的用户名
+                password=os.getenv("DB_PASSWORD", "123456"),  # 登录服务器用的密码
+                database="yangning",  # 指定目标数据库
                 charset='utf8')
             # 规定返回的值为字典类型，否则默认返回元组类型
             self.cursor = self.db.cursor(cursor=pymysql.cursors.DictCursor)
@@ -175,9 +176,9 @@ if __name__ == "__main__":
     '''
     try:
         conn=pymysql.connect(
-            host='localhost',
-            user='root',
-            passwd='123456',
+            host=os.getenv("DB_HOST", "localhost"),
+            user=os.getenv("DB_USER", "root"),
+            passwd=os.getenv("DB_PASSWORD", "123456"),
         )
         cur=conn.cursor()
         create_database_sql='CREATE DATABASE IF NOT EXISTS yangning DEFAULT CHARSET utf8 COLLATE utf8_general_ci;'
