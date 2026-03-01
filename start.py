@@ -343,7 +343,7 @@ def postTeacherScore():
     j = request.form['json']
     d = json.loads(j)
     # {"11":"E","13":"E","14":"E","21":"B"}
-    d_num = {'A': 9, 'B': 8, 'C': 7, 'D': 5}
+    d_num = {'A': 10, 'B': 8, 'C': 6, 'D': 4}
     d2 = dict()
     for i in d:
         if(i[1:] not in d2):
@@ -798,17 +798,15 @@ def getBumenDefen():
 @app.route('/postBumenScore', methods=['POST'])
 @wrapper
 def postBumenScore():
-    # bumen_id t_id num1 num2 num3 num4
+    # bumen_id t_id num1 num2 num3 num4 nums5
     j = request.form['json']
     d = json.loads(j)
-    # d_num = {'A': 9, 'B': 8, 'C': 7, 'D': 5, }
+    d_num = {'A': 10, 'B': 8, 'C': 6, 'D': 4}
     d2 = dict()
     for i in d:
         if(i[1:] not in d2):
             d2[i[1:]] = dict()
-        if(d[i] == ''):
-            return "提交出错！请检查是否有空项"
-        d2[i[1:]][i[0]] = float(d[i])
+        d2[i[1:]][i[0]] = d_num[d[i]]
 
     s = mysql.Sql()
 
@@ -857,15 +855,15 @@ def postBumenScore():
     if len(d2) != count_bumen:
         return f"提交出错！应评价{count_bumen}个部门，但只提交了{len(d2)}个"
     for i in d2:
-        if(len(d2[i]) != 4):
+        if(len(d2[i]) != 5):
             return "提交出错！请检查是否有空项"
 
     for i in d2:
         sql_str = '''
             INSERT INTO bu_geifen(
-                bumen_id,t_id,num1,num2,num3,num4
+                bumen_id,t_id,num1,num2,num3,num4,num5
                 )
-            VALUES (%s, "%s", %s, %s,%s,%s)
+            VALUES (%s, "%s", %s, %s,%s,%s,%s)
         ''' % (
             i,
             session['user']['t_id'],
@@ -873,6 +871,7 @@ def postBumenScore():
             d2[i]['2'],
             d2[i]['3'],
             d2[i]['4'],
+            d2[i]['5']
         )
         s.sqlstr(sql_str)
     # 更改次数标志
@@ -940,7 +939,7 @@ def collectBumenScore():
 
         for record in geifen_records:
             # 民主测评得分 = num1+num2+num3+num4
-            minzhu_score = record['num1'] + record['num2'] + record['num3'] + record['num4']
+            minzhu_score = record['num1'] + record['num2'] + record['num3'] + record['num4'] + record['num5']
 
             # 查询评分人信息
             pingfenren_info = s.search('''

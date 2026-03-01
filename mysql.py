@@ -69,6 +69,7 @@ create table bu_geifen(
     num2 float not null,
     num3 float not null,
     num4 float not null,
+    num5 float not null,
     foreign key(t_id) references teacher(t_id) on delete cascade on update cascade
     )
 '''
@@ -107,7 +108,7 @@ class Sql:
     def __init__(self):
         try:
             self.db = pymysql.connect(
-                host=os.getenv("DB_HOST", "mysql"),  # 指定连接本地服务器
+                host=os.getenv("DB_HOST", "localhost"),  # 指定连接本地服务器
                 user=os.getenv("DB_USER", "root"),  # 登录服务器 用的用户名
                 password=os.getenv("DB_PASSWORD", "123456"),  # 登录服务器用的密码
                 database="yangning",  # 指定目标数据库

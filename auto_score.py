@@ -171,17 +171,16 @@ class AutoScorer:
         return scores
 
     def generate_department_score(self, department_id):
-        """为一个部门生成4个维度的评分
+        """为一个部门生成5个维度的评分
 
         Returns:
-            dict: {"1{department_id}": "95.5", "2{department_id}": "92", ...}
+            dict: {"1{teacher_id}": "A", "2{teacher_id}": "B", ...}
         """
         scores = {}
-        for dimension in range(1, 5):  # 4个维度
-            # 生成1-25之间的随机分数，保留1位小数
-            score = round(random.uniform(1, 25), 1)
+        for dimension in range(1, 6):  # 5个维度
+            grade = random.choices(GRADES, weights=GRADE_WEIGHTS)[0]
             key = f"{dimension}{department_id}"
-            scores[key] = str(score)
+            scores[key] = grade
         return scores
 
     def score_for_user(self, user_id, password, user_name=""):
