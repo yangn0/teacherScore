@@ -15,8 +15,9 @@ services:
       retries: 30
 
   app:
-    build:
-      context: .
+    # build:
+    #   context: .
+    image: teacherscore:latest
     container_name: app
     restart: unless-stopped
     depends_on:
